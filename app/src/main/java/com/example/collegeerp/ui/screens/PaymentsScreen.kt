@@ -7,9 +7,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.collegeerp.ui.PaymentsViewModel
 
 @Composable
-fun PaymentsScreen(studentId: String, onRecord: (amount: Double, method: String) -> Unit) {
+fun PaymentsScreen(studentId: String, onRecord: (amount: Double, method: String) -> Unit = { amt, method -> }) {
+    val viewModel: PaymentsViewModel = hiltViewModel()
     var amountText by remember { mutableStateOf("") }
     var method by remember { mutableStateOf("CASH") }
     Column(Modifier.padding(16.dp)) {
@@ -19,7 +22,12 @@ fun PaymentsScreen(studentId: String, onRecord: (amount: Double, method: String)
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(value = method, onValueChange = { method = it }, label = { Text("Method") })
         Spacer(Modifier.height(12.dp))
-        Button(onClick = { amountText.toDoubleOrNull()?.let { onRecord(it, method) } }, enabled = amountText.toDoubleOrNull() != null) {
+        Button(onClick = {
+            amountText.toDoubleOrNull()?.let {
+                viewModel.recordPayment(studentId, it, method)
+                onRecord(it, method)
+            }
+        }, enabled = amountText.toDoubleOrNull() != null) {
             Text("Save Payment")
         }
     }
