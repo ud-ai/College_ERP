@@ -4,13 +4,12 @@
 		android:name=".CollegeErpApplication"
 		android:allowBackup="true"
 		android:label="CollegeLightERP"
-		android:supportsRtl="true"
-		android:theme="@style/Theme.Material3.DayNight.NoActionBar">
-		<Activity android:name=".MainActivity">
+		android:supportsRtl="true">
+		<activity android:name=".MainActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-		</Activity>
+		</activity>
 	</application>
 </manifest>
