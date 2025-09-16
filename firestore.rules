@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+    function hasRole(role) { return isSignedIn() && role in request.auth.token.roles; }
+    function isSelf(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    // Users can read own profile; admin can read all
+    match /users/{uid} {
+      allow read: if isSelf(uid) || hasRole('ADMIN');
+      allow write: if hasRole('ADMIN');
+    }
+
+    // Students collection readable by STAFF/ADMIN; students can read own
+    match /students/{studentId} {
+      allow read: if hasRole('STAFF') || hasRole('ADMIN') || (isSignedIn() && request.auth.uid == resource.data.userId);
+      allow write: if hasRole('STAFF') || hasRole('ADMIN');
+    }
+
+    // Payments: create by STAFF/ADMIN only, some fields enforced server-side
+    match /payments/{paymentId} {
+      allow read: if hasRole('STAFF') || hasRole('ADMIN') || (isSignedIn() && request.auth.uid == resource.data.studentUid);
+      allow create: if hasRole('STAFF') || hasRole('ADMIN');
+      allow update, delete: if hasRole('ADMIN');
+    }
+
+    // Hostels/rooms: staff/admin manage
+    match /hostels/{hostelId}/rooms/{roomId} {
+      allow read: if hasRole('STAFF') || hasRole('ADMIN');
+      allow write: if hasRole('STAFF') || hasRole('ADMIN');
+    }
+
+    match /exams/{examId}/records/{studentId} {
+      allow read: if hasRole('STAFF') || hasRole('ADMIN') || isSelf(studentId);
+      allow write: if hasRole('STAFF') || hasRole('ADMIN');
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if hasRole('ADMIN');
+      allow write: if hasRole('STAFF') || hasRole('ADMIN');
+    }
+  }
+}
+
+
