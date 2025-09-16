@@ -35,6 +35,9 @@ interface PaymentDao {
 
     @Query("SELECT * FROM payments WHERE studentId = :studentId ORDER BY date DESC")
     fun observeForStudent(studentId: String): Flow<List<PaymentEntity>>
+
+    @Query("SELECT * FROM payments ORDER BY date DESC")
+    fun observeAll(): Flow<List<PaymentEntity>>
 }
 
 @Dao
@@ -50,6 +53,12 @@ interface RoomDao {
 
     @Query("SELECT * FROM room_occupancy WHERE roomKey = :roomKey")
     fun observeOccupancy(roomKey: String): Flow<List<RoomOccupancyEntity>>
+
+    @Query("SELECT * FROM rooms")
+    fun observeAllRooms(): Flow<List<RoomEntity>>
+
+    @Query("SELECT * FROM room_occupancy")
+    fun observeAllOccupancy(): Flow<List<RoomOccupancyEntity>>
 }
 
 @Dao

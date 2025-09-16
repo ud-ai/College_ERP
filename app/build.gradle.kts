@@ -73,6 +73,7 @@ dependencies {
 	implementation(libs.firebase.storage)
 
 	implementation(libs.coil.compose)
+	implementation(libs.mpandroidchart)
 
 	testImplementation(libs.junit)
 	testImplementation(libs.mockk)
