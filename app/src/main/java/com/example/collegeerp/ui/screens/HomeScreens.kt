@@ -13,23 +13,25 @@ import androidx.compose.ui.unit.dp
 import com.example.collegeerp.ui.navigation.Routes
 
 @Composable
-fun AdminHome(onNavigate: (String) -> Unit = {}) {
+fun AdminHome(onNavigate: (String) -> Unit = {}, onSignOut: () -> Unit = {}) {
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Text("Admin Home")
         Button(onClick = { onNavigate(Routes.DASHBOARD) }, modifier = Modifier.padding(top = 8.dp)) { Text("Dashboard") }
         Button(onClick = { onNavigate(Routes.ADMISSIONS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Admissions") }
         Button(onClick = { onNavigate(Routes.STUDENTS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Students") }
         Button(onClick = { onNavigate(Routes.HOSTEL) }, modifier = Modifier.padding(top = 8.dp)) { Text("Hostel") }
+        Button(onClick = { onSignOut() }, modifier = Modifier.padding(top = 16.dp)) { Text("Sign out") }
     }
 }
 
 @Composable
-fun StaffHome(onNavigate: (String) -> Unit = {}) {
+fun StaffHome(onNavigate: (String) -> Unit = {}, onSignOut: () -> Unit = {}) {
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Text("Staff Home")
         Button(onClick = { onNavigate(Routes.ADMISSIONS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Admissions") }
         Button(onClick = { onNavigate(Routes.STUDENTS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Students") }
         Button(onClick = { onNavigate(Routes.HOSTEL) }, modifier = Modifier.padding(top = 8.dp)) { Text("Hostel") }
+        Button(onClick = { onSignOut() }, modifier = Modifier.padding(top = 16.dp)) { Text("Sign out") }
     }
 }
 

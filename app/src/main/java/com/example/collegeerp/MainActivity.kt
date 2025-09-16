@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.collegeerp.domain.model.UserRole
 import com.example.collegeerp.ui.AuthViewModel
 import com.example.collegeerp.ui.navigation.Routes
+import com.example.collegeerp.ui.rbac.RolePermissions
 import com.example.collegeerp.ui.screens.AdminHome
 import com.example.collegeerp.ui.screens.AuthScreen
 import com.example.collegeerp.ui.screens.AdmissionsScreen
@@ -56,8 +57,24 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
                 }
             }
         }
-        composable(Routes.ADMIN_HOME) { AdminHome(onNavigate = { route -> navController.navigate(route) }) }
-        composable(Routes.STAFF_HOME) { StaffHome(onNavigate = { route -> navController.navigate(route) }) }
+        composable(Routes.ADMIN_HOME) {
+            AdminHome(
+                onNavigate = { route -> if (routeAllowed(viewModel, route)) navController.navigate(route) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
+        composable(Routes.STAFF_HOME) {
+            StaffHome(
+                onNavigate = { route -> if (routeAllowed(viewModel, route)) navController.navigate(route) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
         composable(Routes.STUDENT_HOME) { StudentHome() }
 
         // Feature screens (will be navigated from homes later)
@@ -74,4 +91,9 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
         composable(Routes.HOSTEL) { HostelScreen() }
         composable(Routes.DASHBOARD) { DashboardScreen() }
     }
+}
+
+private fun routeAllowed(viewModel: AuthViewModel, route: String): Boolean {
+    val role = viewModel.currentUser.value?.role ?: return false
+    return RolePermissions.allowedRoutes(role).contains(route)
 }
