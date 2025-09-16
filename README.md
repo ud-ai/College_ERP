@@ -12,6 +12,7 @@ Work in progress. This repo is configured for Firebase Emulators and local devel
 4. Start Firebase emulators (Node 18+ required):
    - Install CLI: `npm i -g firebase-tools`
    - Run: `./emulator-setup.sh` (or `firebase emulators:start --only auth,firestore,storage --project college-erp-dev`)
+5. Seed data (optional): `./scripts/seed-dev-data.sh`
 
 ## Firebase configuration
 - Add `app/google-services.json` for your project. For local dev, emulators are used automatically in debug builds.
@@ -26,6 +27,13 @@ Run in Emulator UI or Admin SDK to set claims on a user:
 
 ## Firestore Security Rules
 See `firestore.rules`. Tests coming in `security-rules` task.
+
+## Tests
+- Unit tests: `./gradlew test`
+- Compose UI tests (instrumented): from Android Studio or `./gradlew connectedAndroidTest` with a running emulator
+
+## Cloud Functions
+Dev scaffold in `cloud-functions/`. Use the emulator to run locally.
 
 ## Modules
 - `app` – Android application, DI wiring, navigation
