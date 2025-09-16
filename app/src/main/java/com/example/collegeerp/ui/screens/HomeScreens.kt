@@ -20,6 +20,7 @@ fun AdminHome(onNavigate: (String) -> Unit = {}, onSignOut: () -> Unit = {}) {
         Button(onClick = { onNavigate(Routes.ADMISSIONS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Admissions") }
         Button(onClick = { onNavigate(Routes.STUDENTS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Students") }
         Button(onClick = { onNavigate(Routes.HOSTEL) }, modifier = Modifier.padding(top = 8.dp)) { Text("Hostel") }
+        Button(onClick = { onNavigate(Routes.EXAMS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Exams") }
         Button(onClick = { onSignOut() }, modifier = Modifier.padding(top = 16.dp)) { Text("Sign out") }
     }
 }
@@ -31,6 +32,7 @@ fun StaffHome(onNavigate: (String) -> Unit = {}, onSignOut: () -> Unit = {}) {
         Button(onClick = { onNavigate(Routes.ADMISSIONS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Admissions") }
         Button(onClick = { onNavigate(Routes.STUDENTS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Students") }
         Button(onClick = { onNavigate(Routes.HOSTEL) }, modifier = Modifier.padding(top = 8.dp)) { Text("Hostel") }
+        Button(onClick = { onNavigate(Routes.EXAMS) }, modifier = Modifier.padding(top = 8.dp)) { Text("Exams") }
         Button(onClick = { onSignOut() }, modifier = Modifier.padding(top = 16.dp)) { Text("Sign out") }
     }
 }

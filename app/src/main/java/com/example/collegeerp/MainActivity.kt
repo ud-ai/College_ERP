@@ -25,6 +25,7 @@ import com.example.collegeerp.ui.screens.StaffHome
 import com.example.collegeerp.ui.screens.StudentHome
 import com.example.collegeerp.ui.screens.StudentDetailScreen
 import com.example.collegeerp.ui.screens.StudentsScreen
+import com.example.collegeerp.ui.screens.ExamScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -90,6 +91,7 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
         }
         composable(Routes.HOSTEL) { HostelScreen() }
         composable(Routes.DASHBOARD) { DashboardScreen() }
+        composable(Routes.EXAMS) { ExamScreen() }
     }
 }
 
