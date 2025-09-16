@@ -15,7 +15,8 @@ import com.example.collegeerp.data.local.entity.*
         PaymentEntity::class,
         RoomEntity::class,
         RoomOccupancyEntity::class,
-        ExamRecordEntity::class
+        ExamRecordEntity::class,
+        WriteQueueEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -26,6 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun paymentDao(): PaymentDao
     abstract fun roomDao(): RoomDao
     abstract fun examDao(): ExamDao
+    abstract fun queueDao(): QueueDao
 }
 
 
