@@ -2,7 +2,7 @@
 
 A modular Android app (Kotlin + Jetpack Compose + Hilt) implementing a lightweight college ERP.
 
-Work in progress. This repo is configured for Firebase Emulators and local development.
+CollegeLightERP is a lightweight college ERP app with admissions, fees/receipts, hostel allocation, exam records, and an admin dashboard. It supports offline reads with Room and syncs with Firestore when online. This repo is configured for Firebase Emulators and local development.
 
 ## Quick start
 
@@ -17,6 +17,7 @@ Work in progress. This repo is configured for Firebase Emulators and local devel
 ## Firebase configuration
 - Add `app/google-services.json` for your project. For local dev, emulators are used automatically in debug builds.
 - Default dev admin (emulator): email `admin@college.edu`, password `Admin@123`. See docs below to seed and set custom claims.
+  - To set claims in emulator (example Node REPL with Admin SDK): `admin.auth().setCustomUserClaims('<uid>', { roles: ['ADMIN'] })`
 
 ## Emulator custom claims (RBAC)
 Run in Emulator UI or Admin SDK to set claims on a user:
@@ -34,6 +35,21 @@ See `firestore.rules`. Tests coming in `security-rules` task.
 
 ## Cloud Functions
 Dev scaffold in `cloud-functions/`. Use the emulator to run locally.
+
+## Smoke test
+1) Start emulators: `./emulator-setup.sh`
+2) Seed: `./scripts/seed-dev-data.sh`
+3) Build and run app: `./gradlew assembleDebug`
+4) Sign in with dev admin and verify:
+   - Create admission; see student appear
+   - Record payment; verify receipt PDF and URL
+   - Assign hostel bed; see occupancy % change on dashboard
+   - View exam screen and save a record
+
+## Production setup
+- Replace `google-services.json` with your prod project
+- Review and harden `firestore.rules`
+- Replace default dev admin; never ship dev credentials
 
 ## Modules
 - `app` – Android application, DI wiring, navigation
