@@ -56,8 +56,8 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
                 }
             }
         }
-        composable(Routes.ADMIN_HOME) { AdminHome() }
-        composable(Routes.STAFF_HOME) { StaffHome() }
+        composable(Routes.ADMIN_HOME) { AdminHome(onNavigate = { route -> navController.navigate(route) }) }
+        composable(Routes.STAFF_HOME) { StaffHome(onNavigate = { route -> navController.navigate(route) }) }
         composable(Routes.STUDENT_HOME) { StudentHome() }
 
         // Feature screens (will be navigated from homes later)
