@@ -13,10 +13,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.collegeerp.domain.model.UserRole
 import com.example.collegeerp.ui.AuthViewModel
+import com.example.collegeerp.ui.navigation.Routes
 import com.example.collegeerp.ui.screens.AdminHome
 import com.example.collegeerp.ui.screens.AuthScreen
+import com.example.collegeerp.ui.screens.AdmissionsScreen
+import com.example.collegeerp.ui.screens.DashboardScreen
+import com.example.collegeerp.ui.screens.HostelScreen
+import com.example.collegeerp.ui.screens.PaymentsScreen
 import com.example.collegeerp.ui.screens.StaffHome
 import com.example.collegeerp.ui.screens.StudentHome
+import com.example.collegeerp.ui.screens.StudentDetailScreen
+import com.example.collegeerp.ui.screens.StudentsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,20 +44,34 @@ class MainActivity : ComponentActivity() {
 fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "auth") {
-        composable("auth") {
+    NavHost(navController = navController, startDestination = Routes.AUTH) {
+        composable(Routes.AUTH) {
             AuthScreen(onSignIn = { email, password -> viewModel.signIn(email, password) })
             val user = viewModel.currentUser.value
             if (user != null) {
                 when (user.role) {
-                    UserRole.ADMIN -> navController.navigate("admin") { popUpTo("auth") { inclusive = true } }
-                    UserRole.STAFF -> navController.navigate("staff") { popUpTo("auth") { inclusive = true } }
-                    UserRole.STUDENT -> navController.navigate("student") { popUpTo("auth") { inclusive = true } }
+                    UserRole.ADMIN -> navController.navigate(Routes.ADMIN_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
+                    UserRole.STAFF -> navController.navigate(Routes.STAFF_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
+                    UserRole.STUDENT -> navController.navigate(Routes.STUDENT_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
                 }
             }
         }
-        composable("admin") { AdminHome() }
-        composable("staff") { StaffHome() }
-        composable("student") { StudentHome() }
+        composable(Routes.ADMIN_HOME) { AdminHome() }
+        composable(Routes.STAFF_HOME) { StaffHome() }
+        composable(Routes.STUDENT_HOME) { StudentHome() }
+
+        // Feature screens (will be navigated from homes later)
+        composable(Routes.ADMISSIONS) { AdmissionsScreen { _, _ -> } }
+        composable(Routes.STUDENTS) { StudentsScreen(students = emptyList()) { _ -> } }
+        composable(Routes.STUDENT_DETAIL) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("studentId") ?: ""
+            StudentDetailScreen(id)
+        }
+        composable(Routes.PAYMENTS) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("studentId") ?: ""
+            PaymentsScreen(id) { _, _ -> }
+        }
+        composable(Routes.HOSTEL) { HostelScreen() }
+        composable(Routes.DASHBOARD) { DashboardScreen() }
     }
 }
