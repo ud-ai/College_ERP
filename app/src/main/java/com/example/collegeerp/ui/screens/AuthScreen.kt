@@ -184,10 +184,14 @@ fun AuthScreen(
                                     return@Button
                                 }
                                 
-                                viewModel.signIn(email, password)
-                                // Pass credentials to the callback
-                                onSignIn(email, password)
-                                isLoading = false
+                                viewModel.signIn(email, password) { success, error ->
+                                    isLoading = false
+                                    if (success) {
+                                        onSignIn(email, password)
+                                    } else {
+                                        errorMessage = error ?: "Sign in failed. Please check your credentials and ensure Firebase emulators are running."
+                                    }
+                                }
                             } else {
                                 if (name.isBlank()) {
                                     errorMessage = "Please enter your name"
@@ -211,8 +215,13 @@ fun AuthScreen(
                                     isLoading = false
                                     if (success) {
                                         // Auto login after signup
-                                        viewModel.signIn(email, password)
-                                        onSignIn(email, password)
+                                        viewModel.signIn(email, password) { loginSuccess, loginError ->
+                                            if (loginSuccess) {
+                                                onSignIn(email, password)
+                                            } else {
+                                                errorMessage = loginError ?: "Auto-login failed after signup"
+                                            }
+                                        }
                                     } else {
                                         errorMessage = "Failed to create account. The email may already be in use or there might be network issues. Please check your internet connection and try again."
                                     }

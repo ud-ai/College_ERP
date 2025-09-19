@@ -12,11 +12,7 @@ import dagger.hilt.android.HiltAndroidApp
 class DebugCollegeErpApplication : CollegeErpApplication() {
     override fun onCreate() {
         super.onCreate()
-        // Defaults for emulator suite.
-        val host = "10.0.2.2" // Android emulator -> host
-        FirebaseAuth.getInstance().useEmulator(host, 9099)
-        FirebaseFirestore.getInstance().useEmulator(host, 8080)
-        FirebaseStorage.getInstance().useEmulator(host, 9199)
+        // Emulator connection disabled - using production Firebase
     }
 }
 

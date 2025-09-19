@@ -1,0 +1,23 @@
+{
+  "name": "college_erp",
+  "version": "1.0.0",
+  "description": "A modular Android app (Kotlin + Jetpack Compose + Hilt) implementing a lightweight college ERP.",
+  "main": "create-admin-user.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ud-ai/College_ERP.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ud-ai/College_ERP/issues"
+  },
+  "homepage": "https://github.com/ud-ai/College_ERP#readme",
+  "dependencies": {
+    "firebase-admin": "^13.5.0"
+  }
+}

@@ -47,7 +47,14 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signIn(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).await()
+        try {
+            android.util.Log.d("AuthRepository", "Attempting sign in for: $email")
+            auth.signInWithEmailAndPassword(email, password).await()
+            android.util.Log.d("AuthRepository", "Sign in successful")
+        } catch (e: Exception) {
+            android.util.Log.e("AuthRepository", "Sign in failed: ${e.message}", e)
+            throw e
+        }
     }
     
     override suspend fun signUp(email: String, password: String, name: String): String {

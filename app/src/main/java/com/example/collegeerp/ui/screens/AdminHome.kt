@@ -1,36 +1,202 @@
 package com.example.collegeerp.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.collegeerp.ui.AuthViewModel
+import com.example.collegeerp.ui.navigation.Routes
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminHome(
     onNavigate: (String) -> Unit,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    Column(
+    val user by authViewModel.currentUser.collectAsState()
+    
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Admin Dashboard",
-            style = MaterialTheme.typography.headlineMedium
-        )
+        item {
+            // Header
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        text = "Welcome, ${user?.name ?: "Admin"}!",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = "Admin Dashboard",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    )
+                }
+            }
+        }
         
-        Spacer(modifier = Modifier.height(32.dp))
+        item {
+            Text(
+                text = "Management",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
         
-        Button(
-            onClick = onSignOut,
-            modifier = Modifier.fillMaxWidth()
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AdminActionCard(
+                    title = "Dashboard",
+                    description = "View analytics",
+                    icon = Icons.Default.Info,
+                    color = Color(0xFF2196F3),
+                    onClick = { onNavigate(Routes.DASHBOARD) },
+                    modifier = Modifier.weight(1f)
+                )
+                AdminActionCard(
+                    title = "Students",
+                    description = "Manage students",
+                    icon = Icons.Default.Person,
+                    color = Color(0xFF4CAF50),
+                    onClick = { onNavigate(Routes.STUDENTS) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AdminActionCard(
+                    title = "Admissions",
+                    description = "Process applications",
+                    icon = Icons.Default.Add,
+                    color = Color(0xFFFF9800),
+                    onClick = { onNavigate(Routes.ADMISSIONS) },
+                    modifier = Modifier.weight(1f)
+                )
+                AdminActionCard(
+                    title = "Payments",
+                    description = "Fee management",
+                    icon = Icons.Default.Star,
+                    color = Color(0xFF9C27B0),
+                    onClick = { onNavigate(Routes.PAYMENTS) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                AdminActionCard(
+                    title = "Hostel",
+                    description = "Room allocation",
+                    icon = Icons.Default.Home,
+                    color = Color(0xFFF44336),
+                    onClick = { onNavigate(Routes.HOSTEL) },
+                    modifier = Modifier.weight(1f)
+                )
+                AdminActionCard(
+                    title = "Exams",
+                    description = "Results & records",
+                    icon = Icons.Default.Settings,
+                    color = Color(0xFF607D8B),
+                    onClick = { onNavigate(Routes.EXAMS) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedButton(
+                onClick = onSignOut,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ExitToApp,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Sign Out")
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminActionCard(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.height(120.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Sign Out")
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(32.dp)
+            )
+            Column {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

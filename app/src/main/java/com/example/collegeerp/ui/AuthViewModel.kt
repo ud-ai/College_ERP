@@ -19,12 +19,14 @@ class AuthViewModel @Inject constructor(
     val currentUser: StateFlow<AppUser?> = authRepository.currentUserFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    fun signIn(email: String, password: String) {
+    fun signIn(email: String, password: String, onComplete: (Boolean, String?) -> Unit = { _, _ -> }) {
         viewModelScope.launch {
             try {
                 authRepository.signIn(email, password)
+                onComplete(true, null)
             } catch (e: Exception) {
                 android.util.Log.e("AuthViewModel", "Sign-in failed", e)
+                onComplete(false, e.message ?: "Sign in failed")
             }
         }
     }

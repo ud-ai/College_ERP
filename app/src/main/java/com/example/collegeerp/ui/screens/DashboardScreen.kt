@@ -1,45 +1,133 @@
 package com.example.collegeerp.ui.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.collegeerp.ui.DashboardViewModel
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.Description
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import androidx.compose.ui.viewinterop.AndroidView
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen() {
     val viewModel: DashboardViewModel = hiltViewModel()
     val kpis = viewModel.kpis.collectAsState().value
-    Column(Modifier.padding(16.dp)) {
-        Text("Admin Dashboard")
-        Text("Today's Collection: ${kpis.todayCollection}")
-        Text("This Month: ${kpis.monthCollection}")
-        Text("Occupancy: ${kpis.occupancyPercent}%")
-        Text("Pending Admissions: ${kpis.pendingAdmissions}")
-
-        AndroidView(factory = { ctx ->
-            BarChart(ctx).apply {
-                description = Description().apply { text = "Collections" }
-            }
-        }, update = { chart ->
-            val entries = listOf(
-                BarEntry(0f, kpis.todayCollection.toFloat()),
-                BarEntry(1f, kpis.monthCollection.toFloat())
+    
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            Text(
+                text = "Dashboard",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
-            val dataSet = BarDataSet(entries, "Fees").apply { valueTextSize = 12f }
-            chart.data = BarData(dataSet)
-            chart.invalidate()
-        })
+        }
+        
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DashboardCard(
+                    title = "Today's Collection",
+                    value = "₹${kpis.todayCollection}",
+                    icon = Icons.Default.Star,
+                    color = Color(0xFF4CAF50),
+                    modifier = Modifier.weight(1f)
+                )
+                DashboardCard(
+                    title = "This Month",
+                    value = "₹${kpis.monthCollection}",
+                    icon = Icons.Default.Star,
+                    color = Color(0xFF2196F3),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DashboardCard(
+                    title = "Occupancy",
+                    value = "${kpis.occupancyPercent}%",
+                    icon = Icons.Default.Home,
+                    color = Color(0xFFFF9800),
+                    modifier = Modifier.weight(1f)
+                )
+                DashboardCard(
+                    title = "Pending Admissions",
+                    value = "${kpis.pendingAdmissions}",
+                    icon = Icons.Default.Settings,
+                    color = Color(0xFFF44336),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DashboardCard(
+    title: String,
+    value: String,
+    icon: ImageVector,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.height(120.dp),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+        }
     }
 }
 
