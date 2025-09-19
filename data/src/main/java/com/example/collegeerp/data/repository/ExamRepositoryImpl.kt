@@ -17,7 +17,7 @@ class ExamRepositoryImpl @Inject constructor(
         db.examDao().observe(examId, studentId).map { it?.toDomain() }
 
     override suspend fun upsert(record: ExamRecord) {
-        db.examDao().upsert(record.toEntity())
+        db.examDao().insert(record.toEntity())
     }
 }
 

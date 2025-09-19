@@ -36,7 +36,7 @@ class RealtimeMirror @Inject constructor(
                         contactPhone = null,
                         guardianName = null
                     )
-                    db.studentDao().upsert(e)
+                    db.studentDao().insert(e)
                 }
             }
         }
@@ -55,7 +55,7 @@ class RealtimeMirror @Inject constructor(
                         receiptUrl = doc.getString("receiptUrl"),
                         transactionNote = doc.getString("transactionNote")
                     )
-                    db.paymentDao().upsert(e)
+                    db.paymentDao().insert(e)
                 }
             }
         }

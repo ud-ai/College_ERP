@@ -5,16 +5,17 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "rooms")
 data class RoomEntity(
-    @PrimaryKey val roomId: String,
+    @PrimaryKey val roomKey: String, // hostelId_roomId
     val hostelId: String,
+    val roomId: String,
     val roomNo: String,
     val capacity: Int
 )
 
-@Entity(tableName = "occupancy")
-data class OccupancyEntity(
-    @PrimaryKey val id: String,
-    val roomId: String,
+@Entity(tableName = "room_occupancy")
+data class RoomOccupancyEntity(
+    @PrimaryKey val key: String, // roomKey_studentId
+    val roomKey: String,
     val studentId: String,
     val bedNo: String,
     val since: Long

@@ -1,23 +1,19 @@
 package com.example.collegeerp.data.local.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.collegeerp.data.local.entity.WriteQueueEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface QueueDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun enqueue(entity: WriteQueueEntity)
+    @Query("SELECT * FROM write_queue ORDER BY timestamp ASC LIMIT 10")
+    suspend fun nextBatch(): List<WriteQueueEntity>
 
-    @Query("SELECT * FROM write_queue ORDER BY timestamp ASC LIMIT :limit")
-    suspend fun nextBatch(limit: Int = 20): List<WriteQueueEntity>
+    @Insert
+    suspend fun insert(item: WriteQueueEntity)
 
     @Delete
-    suspend fun remove(vararg items: WriteQueueEntity)
+    suspend fun remove(item: WriteQueueEntity)
+
+    @Query("DELETE FROM write_queue")
+    suspend fun clear()
 }
-
-

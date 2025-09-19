@@ -16,7 +16,7 @@ class HostelRepositoryImpl @Inject constructor(
     private val db: AppDatabase
 ) : HostelRepository {
     override fun observeRooms(hostelId: String): Flow<List<HostelRoom>> {
-        return db.roomDao().observeRooms(hostelId).map { rooms ->
+        return db.roomDao().observeRoomsByHostel(hostelId).map { rooms ->
             rooms.map { it.toDomain(emptyList()) } // occupancy joined later if needed
         }
     }

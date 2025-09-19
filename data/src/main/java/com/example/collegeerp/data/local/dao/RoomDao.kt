@@ -1,7 +1,7 @@
 package com.example.collegeerp.data.local.dao
 
 import androidx.room.*
-import com.example.collegeerp.data.local.entity.OccupancyEntity
+import com.example.collegeerp.data.local.entity.RoomOccupancyEntity
 import com.example.collegeerp.data.local.entity.RoomEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -10,8 +10,8 @@ interface RoomDao {
     @Query("SELECT * FROM rooms")
     fun observeAllRooms(): Flow<List<RoomEntity>>
 
-    @Query("SELECT * FROM occupancy")
-    fun observeAllOccupancy(): Flow<List<OccupancyEntity>>
+    @Query("SELECT * FROM room_occupancy")
+    fun observeAllOccupancy(): Flow<List<RoomOccupancyEntity>>
 
     @Query("SELECT * FROM rooms WHERE hostelId = :hostelId")
     fun observeRoomsByHostel(hostelId: String): Flow<List<RoomEntity>>
@@ -20,8 +20,8 @@ interface RoomDao {
     suspend fun insertRoom(room: RoomEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOccupancy(occupancy: OccupancyEntity)
+    suspend fun insertOccupancy(occupancy: RoomOccupancyEntity)
 
     @Delete
-    suspend fun deleteOccupancy(occupancy: OccupancyEntity)
+    suspend fun deleteOccupancy(occupancy: RoomOccupancyEntity)
 }
