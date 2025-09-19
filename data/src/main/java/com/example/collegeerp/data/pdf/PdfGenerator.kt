@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import com.example.collegeerp.domain.model.FeePayment
 import com.example.collegeerp.domain.model.Student
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PdfGenerator @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     

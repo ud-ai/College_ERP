@@ -29,7 +29,7 @@ class HostelViewModel @Inject constructor(
                 bedNo = bedNo,
                 since = System.currentTimeMillis()
             )
-            db.roomDao().upsertOccupancy(occ)
+            db.roomDao().insertOccupancy(occ)
 
             val ref = firestore.collection("hostels").document(hostelId)
                 .collection("rooms").document(roomId)
