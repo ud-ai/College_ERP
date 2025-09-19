@@ -19,6 +19,11 @@ import com.example.collegeerp.ui.AuthViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentHome(
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToFees: () -> Unit = {},
+    onNavigateToHostel: () -> Unit = {},
+    onNavigateToExams: () -> Unit = {},
+    onSignOut: () -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val user by authViewModel.currentUser.collectAsState()
@@ -75,7 +80,7 @@ fun StudentHome(
                     description = "View and edit profile",
                     icon = Icons.Default.Person,
                     color = Color(0xFF2196F3),
-                    onClick = { /* Navigate to profile */ },
+                    onClick = onNavigateToProfile,
                     modifier = Modifier.weight(1f)
                 )
                 StudentActionCard(
@@ -83,7 +88,7 @@ fun StudentHome(
                     description = "Payment history",
                     icon = Icons.Default.Star,
                     color = Color(0xFF4CAF50),
-                    onClick = { /* Navigate to fees */ },
+                    onClick = onNavigateToFees,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -99,7 +104,7 @@ fun StudentHome(
                     description = "Room details",
                     icon = Icons.Default.Home,
                     color = Color(0xFFFF9800),
-                    onClick = { /* Navigate to hostel */ },
+                    onClick = onNavigateToHostel,
                     modifier = Modifier.weight(1f)
                 )
                 StudentActionCard(
@@ -107,7 +112,7 @@ fun StudentHome(
                     description = "Results & schedule",
                     icon = Icons.Default.Settings,
                     color = Color(0xFF9C27B0),
-                    onClick = { /* Navigate to exams */ },
+                    onClick = onNavigateToExams,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -118,6 +123,7 @@ fun StudentHome(
             OutlinedButton(
                 onClick = {
                     authViewModel.signOut()
+                    onSignOut()
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

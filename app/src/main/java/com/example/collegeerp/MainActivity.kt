@@ -28,6 +28,7 @@ import com.example.collegeerp.ui.screens.StudentHome
 import com.example.collegeerp.ui.screens.StudentDetailScreen
 import com.example.collegeerp.ui.screens.StudentsScreen
 import com.example.collegeerp.ui.screens.ExamScreen
+import com.example.collegeerp.ui.screens.ProfileScreen
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.runtime.LaunchedEffect
 
@@ -86,7 +87,17 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
                 }
             )
         }
-        composable(Routes.STUDENT_HOME) { StudentHome() }
+        composable(Routes.STUDENT_HOME) { 
+            StudentHome(
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onNavigateToFees = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToHostel = { navController.navigate(Routes.HOSTEL) },
+                onNavigateToExams = { navController.navigate(Routes.EXAMS) },
+                onSignOut = {
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
 
         // Feature screens (will be navigated from homes later)
         composable(Routes.ADMISSIONS) { AdmissionsScreen { _, _ -> } }
@@ -100,8 +111,19 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
             PaymentsScreen(id) { _, _ -> }
         }
         composable(Routes.HOSTEL) { HostelScreen() }
-        composable(Routes.DASHBOARD) { DashboardScreen() }
+        composable(Routes.DASHBOARD) { 
+            DashboardScreen(
+                onNavigateToPayments = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToHostel = { navController.navigate(Routes.HOSTEL) },
+                onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) }
+            )
+        }
         composable(Routes.EXAMS) { ExamScreen() }
+        composable(Routes.PROFILE) { 
+            ProfileScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }
 

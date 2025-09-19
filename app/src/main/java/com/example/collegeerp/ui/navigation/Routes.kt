@@ -14,6 +14,7 @@ object Routes {
     const val HOSTEL = "hostel"
     const val DASHBOARD = "dashboard"
     const val EXAMS = "exams"
+    const val PROFILE = "profile"
 }
 
 

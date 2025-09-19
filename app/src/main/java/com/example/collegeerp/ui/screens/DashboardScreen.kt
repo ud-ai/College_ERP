@@ -3,6 +3,9 @@ package com.example.collegeerp.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,7 +23,11 @@ import com.example.collegeerp.ui.DashboardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    onNavigateToPayments: () -> Unit = {},
+    onNavigateToHostel: () -> Unit = {},
+    onNavigateToAdmissions: () -> Unit = {}
+) {
     val viewModel: DashboardViewModel = hiltViewModel()
     val kpis = viewModel.kpis.collectAsState().value
     
@@ -48,6 +56,7 @@ fun DashboardScreen() {
                     value = "₹${kpis.todayCollection}",
                     icon = Icons.Default.Star,
                     color = Color(0xFF4CAF50),
+                    onClick = onNavigateToPayments,
                     modifier = Modifier.weight(1f)
                 )
                 DashboardCard(
@@ -55,6 +64,7 @@ fun DashboardScreen() {
                     value = "₹${kpis.monthCollection}",
                     icon = Icons.Default.Star,
                     color = Color(0xFF2196F3),
+                    onClick = onNavigateToPayments,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -70,6 +80,7 @@ fun DashboardScreen() {
                     value = "${kpis.occupancyPercent}%",
                     icon = Icons.Default.Home,
                     color = Color(0xFFFF9800),
+                    onClick = onNavigateToHostel,
                     modifier = Modifier.weight(1f)
                 )
                 DashboardCard(
@@ -77,6 +88,7 @@ fun DashboardScreen() {
                     value = "${kpis.pendingAdmissions}",
                     icon = Icons.Default.Settings,
                     color = Color(0xFFF44336),
+                    onClick = onNavigateToAdmissions,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -90,9 +102,11 @@ fun DashboardCard(
     value: String,
     icon: ImageVector,
     color: Color,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier.height(120.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
