@@ -31,11 +31,11 @@ class AuthViewModel @Inject constructor(
         }
     }
     
-    fun signUp(email: String, password: String, name: String, onComplete: (Boolean) -> Unit = {}) {
+    fun signUp(email: String, password: String, name: String, role: String = "Student", onComplete: (Boolean) -> Unit = {}) {
         viewModelScope.launch { 
             try {
-                android.util.Log.d("AuthViewModel", "Starting signup for email: $email")
-                authRepository.signUp(email, password, name)
+                android.util.Log.d("AuthViewModel", "Starting signup for email: $email with role: $role")
+                authRepository.signUp(email, password, name, role)
                 android.util.Log.d("AuthViewModel", "Signup successful")
                 onComplete(true)
             } catch (e: Exception) {

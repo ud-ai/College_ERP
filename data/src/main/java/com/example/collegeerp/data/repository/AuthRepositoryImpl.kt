@@ -31,16 +31,43 @@ class AuthRepositoryImpl @Inject constructor(
     }.flatMapLatest { user ->
         if (user == null) flowOf(null) else flow {
             try {
-                val tokenResult = user.getIdToken(true).await()
-                val roles = (tokenResult.claims?.get("roles") as? List<*>)?.map { it.toString() } ?: emptyList()
-                val role = when {
-                    roles.contains("ADMIN") -> UserRole.ADMIN
-                    roles.contains("STAFF") -> UserRole.STAFF
-                    else -> UserRole.STUDENT
+                // First try to get role from local database
+                val localUser = db.userDao().getUserByUid(user.uid)
+                val role = if (localUser != null) {
+                    try {
+                        UserRole.valueOf(localUser.role)
+                    } catch (e: Exception) {
+                        UserRole.STUDENT
+                    }
+                } else {
+                    // Fallback to Firebase custom claims
+                    try {
+                        val tokenResult = user.getIdToken(true).await()
+                        val roles = (tokenResult.claims?.get("roles") as? List<*>)?.map { it.toString() } ?: emptyList()
+                        when {
+                            roles.contains("ADMIN") -> UserRole.ADMIN
+                            roles.contains("ADMISSION_CELL") -> UserRole.ADMISSION_CELL
+                            roles.contains("ACCOUNTS") -> UserRole.ACCOUNTS
+                            roles.contains("HOSTEL_MANAGER") -> UserRole.HOSTEL_MANAGER
+                            roles.contains("EXAM_STAFF") -> UserRole.EXAM_STAFF
+                            else -> UserRole.STUDENT
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("AuthRepositoryImpl", "Error fetching ID token: ${e.message}", e)
+                        UserRole.STUDENT
+                    }
                 }
-                emit(AppUser(uid = user.uid, name = user.displayName ?: "", email = user.email ?: "", role = role, phone = user.phoneNumber, createdAt = System.currentTimeMillis()))
+                
+                emit(AppUser(
+                    uid = user.uid, 
+                    name = user.displayName ?: localUser?.name ?: "", 
+                    email = user.email ?: "", 
+                    role = role, 
+                    phone = user.phoneNumber ?: localUser?.phone, 
+                    createdAt = localUser?.createdAt ?: System.currentTimeMillis()
+                ))
             } catch (e: Exception) {
-                android.util.Log.e("AuthRepositoryImpl", "Error fetching ID token: ${e.message}", e)
+                android.util.Log.e("AuthRepositoryImpl", "Error in currentUserFlow: ${e.message}", e)
                 emit(AppUser(uid = user.uid, name = user.displayName ?: "", email = user.email ?: "", role = UserRole.STUDENT, phone = user.phoneNumber, createdAt = System.currentTimeMillis()))
             }
         }
@@ -57,9 +84,9 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
     
-    override suspend fun signUp(email: String, password: String, name: String): String {
+    override suspend fun signUp(email: String, password: String, name: String, role: String): String {
         try {
-            android.util.Log.d("AuthRepositoryImpl", "Creating user with email: $email")
+            android.util.Log.d("AuthRepositoryImpl", "Creating user with email: $email and role: $role")
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val user = result.user ?: throw IllegalStateException("User creation failed - Firebase returned null user")
             
@@ -70,11 +97,35 @@ class AuthRepositoryImpl @Inject constructor(
                 .build()
             user.updateProfile(profileUpdates).await()
             
-            android.util.Log.d("AuthRepositoryImpl", "Profile updated successfully for uid: ${user.uid}")
+            // Store user role in local database for now
+            val userRole = mapStringToUserRole(role)
+            val userEntity = UserEntity(
+                uid = user.uid,
+                name = name,
+                email = email,
+                role = userRole.name,
+                phone = null,
+                createdAt = System.currentTimeMillis()
+            )
+            db.userDao().insertUser(userEntity)
+            
+            android.util.Log.d("AuthRepositoryImpl", "User role assigned: $role (${userRole.name}) for uid: ${user.uid}")
             return user.uid
         } catch (e: Exception) {
             android.util.Log.e("AuthRepositoryImpl", "Error during signup for email: $email - ${e.message}", e)
             throw e
+        }
+    }
+    
+    private fun mapStringToUserRole(roleString: String): UserRole {
+        return when (roleString) {
+            "Student" -> UserRole.STUDENT
+            "Admission Cell" -> UserRole.ADMISSION_CELL
+            "Accounts" -> UserRole.ACCOUNTS
+            "Hostel Manager" -> UserRole.HOSTEL_MANAGER
+            "Exam Staff" -> UserRole.EXAM_STAFF
+            "Admin" -> UserRole.ADMIN
+            else -> UserRole.STUDENT
         }
     }
 

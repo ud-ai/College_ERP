@@ -17,6 +17,8 @@ import com.example.collegeerp.ui.AuthViewModel
 @Composable
 fun ProfileScreen(
     onBack: () -> Unit = {},
+    onEditProfile: () -> Unit = {},
+    onSignOut: () -> Unit = {},
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val user by authViewModel.currentUser.collectAsState()
@@ -90,7 +92,7 @@ fun ProfileScreen(
         
         // Action Buttons
         OutlinedButton(
-            onClick = { /* TODO: Edit profile */ },
+            onClick = onEditProfile,
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
@@ -100,6 +102,25 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text("Edit Profile")
+        }
+        
+        Button(
+            onClick = {
+                authViewModel.signOut()
+                onSignOut()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.ExitToApp,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Sign Out")
         }
     }
 }

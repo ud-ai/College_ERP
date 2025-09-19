@@ -15,25 +15,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.collegeerp.ui.DashboardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(
-    onNavigateToPayments: () -> Unit = {},
-    onNavigateToHostel: () -> Unit = {},
-    onNavigateToAdmissions: () -> Unit = {},
+fun StudentDashboard(
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToExams: () -> Unit = {},
-    onNavigateToStudents: () -> Unit = {},
+    onNavigateToAttendance: () -> Unit = {},
+    onNavigateToMarks: () -> Unit = {},
+    onNavigateToFees: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
-    val viewModel: DashboardViewModel = hiltViewModel()
-    val kpis = viewModel.kpis.collectAsState().value
-    
     Scaffold(
-        bottomBar = { BottomNavigation(onNavigateToProfile = onNavigateToProfile) }
+        bottomBar = { 
+            StudentBottomNavigation(
+                onNavigateToProfile = onNavigateToProfile,
+                onSignOut = onSignOut
+            ) 
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -41,7 +39,7 @@ fun DashboardScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            // Header with blue background
+            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -61,7 +59,7 @@ fun DashboardScreen(
                     )
                     
                     Text(
-                        text = "Dashboard",
+                        text = "Student Portal",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -76,7 +74,7 @@ fun DashboardScreen(
                 }
             }
             
-            // Content with padding
+            // Content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -90,7 +88,7 @@ fun DashboardScreen(
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
                 
-                // Grid of cards - 3x2
+                // Student specific cards - 2x2 grid
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -98,18 +96,18 @@ fun DashboardScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        QuickAccessCard(
-                            title = "Admissions",
-                            icon = Icons.Default.Star,
-                            color = Color(0xFF4CAF50),
-                            onClick = onNavigateToAdmissions,
-                            modifier = Modifier.weight(1f)
-                        )
-                        QuickAccessCard(
-                            title = "Students",
+                        StudentQuickAccessCard(
+                            title = "My Profile",
                             icon = Icons.Default.Person,
                             color = Color(0xFF2196F3),
-                            onClick = onNavigateToStudents,
+                            onClick = onNavigateToProfile,
+                            modifier = Modifier.weight(1f)
+                        )
+                        StudentQuickAccessCard(
+                            title = "Attendance",
+                            icon = Icons.Default.DateRange,
+                            color = Color(0xFF4CAF50),
+                            onClick = onNavigateToAttendance,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -118,35 +116,20 @@ fun DashboardScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        QuickAccessCard(
-                            title = "Fees",
-                            icon = Icons.Default.AccountBox,
+                        StudentQuickAccessCard(
+                            title = "My Marks",
+                            icon = Icons.Default.Star,
                             color = Color(0xFFFF9800),
-                            onClick = onNavigateToPayments,
+                            onClick = onNavigateToMarks,
                             modifier = Modifier.weight(1f)
                         )
-                        QuickAccessCard(
-                            title = "Hostel",
-                            icon = Icons.Default.Home,
+                        StudentQuickAccessCard(
+                            title = "My Fees",
+                            icon = Icons.Default.AccountBox,
                             color = Color(0xFF9C27B0),
-                            onClick = onNavigateToHostel,
+                            onClick = onNavigateToFees,
                             modifier = Modifier.weight(1f)
                         )
-                    }
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        QuickAccessCard(
-                            title = "Exams",
-                            icon = Icons.Default.Edit,
-                            color = Color(0xFFF44336),
-                            onClick = onNavigateToExams,
-                            modifier = Modifier.weight(1f)
-                        )
-                        // Empty space for symmetry
-                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
@@ -155,7 +138,7 @@ fun DashboardScreen(
 }
 
 @Composable
-fun QuickAccessCard(
+fun StudentQuickAccessCard(
     title: String,
     icon: ImageVector,
     color: Color,
@@ -209,8 +192,9 @@ fun QuickAccessCard(
 }
 
 @Composable
-fun BottomNavigation(
-    onNavigateToProfile: () -> Unit = {}
+fun StudentBottomNavigation(
+    onNavigateToProfile: () -> Unit = {},
+    onSignOut: () -> Unit = {}
 ) {
     NavigationBar(
         containerColor = Color.White,
@@ -235,7 +219,7 @@ fun BottomNavigation(
             icon = {
                 Icon(
                     Icons.Default.DateRange,
-                    contentDescription = "Schedule"
+                    contentDescription = "Attendance"
                 )
             },
             selected = false,
@@ -249,8 +233,8 @@ fun BottomNavigation(
         NavigationBarItem(
             icon = {
                 Icon(
-                    Icons.Default.Notifications,
-                    contentDescription = "Notifications"
+                    Icons.Default.Star,
+                    contentDescription = "Marks"
                 )
             },
             selected = false,
@@ -278,7 +262,3 @@ fun BottomNavigation(
         )
     }
 }
-
-
-
-

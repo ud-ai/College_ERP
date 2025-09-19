@@ -29,6 +29,16 @@ import com.example.collegeerp.ui.screens.StudentDetailScreen
 import com.example.collegeerp.ui.screens.StudentsScreen
 import com.example.collegeerp.ui.screens.ExamScreen
 import com.example.collegeerp.ui.screens.ProfileScreen
+import com.example.collegeerp.ui.screens.PersonalDetailsScreen
+import com.example.collegeerp.ui.screens.HostelRoomsScreen
+import com.example.collegeerp.ui.screens.HostelAllocationScreen
+import com.example.collegeerp.ui.screens.ViewStudentExamRecordsScreen
+import com.example.collegeerp.ui.screens.AddUpdateMarksScreen
+import com.example.collegeerp.ui.screens.StudentDashboard
+import com.example.collegeerp.ui.screens.AdmissionStaffDashboard
+import com.example.collegeerp.ui.screens.HostelStaffDashboard
+import com.example.collegeerp.ui.screens.AccountsStaffDashboard
+import com.example.collegeerp.ui.screens.ExamStaffDashboard
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.runtime.LaunchedEffect
 
@@ -63,8 +73,11 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
                 if (u != null) {
                     when (u.role) {
                         UserRole.ADMIN -> navController.navigate(Routes.ADMIN_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
-                        UserRole.STAFF -> navController.navigate(Routes.STAFF_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
-                        UserRole.STUDENT -> navController.navigate(Routes.STUDENT_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        UserRole.STUDENT -> navController.navigate(Routes.STUDENT_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        UserRole.ADMISSION_CELL -> navController.navigate(Routes.ADMISSION_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        UserRole.HOSTEL_MANAGER -> navController.navigate(Routes.HOSTEL_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        UserRole.ACCOUNTS -> navController.navigate(Routes.ACCOUNTS_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        UserRole.EXAM_STAFF -> navController.navigate(Routes.EXAM_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
                     }
                 }
             }
@@ -100,28 +113,155 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
         }
 
         // Feature screens (will be navigated from homes later)
-        composable(Routes.ADMISSIONS) { AdmissionsScreen { _, _ -> } }
-        composable(Routes.STUDENTS) { StudentsScreen(students = emptyList()) { _ -> } }
+        composable(Routes.ADMISSIONS) { 
+            AdmissionsScreen(
+                onSubmit = { _, _ -> },
+                onBack = { navController.popBackStack() },
+                onStartNewAdmission = { navController.navigate(Routes.PERSONAL_DETAILS) },
+                onViewPending = { /* Navigate to pending admissions */ },
+                onSearchAdmissions = { /* Navigate to search */ }
+            )
+        }
+        composable(Routes.STUDENTS) { 
+            StudentsScreen(
+                students = emptyList(),
+                onOpen = { _ -> },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.STUDENT_LIST) {
+            StudentsScreen(
+                onBack = { navController.popBackStack() },
+                onOpen = { studentId -> navController.navigate(Routes.STUDENT_DETAIL.replace("{studentId}", studentId)) }
+            )
+        }
         composable(Routes.STUDENT_DETAIL) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("studentId") ?: ""
-            StudentDetailScreen(id)
+            StudentDetailScreen(
+                studentId = id,
+                onBack = { navController.popBackStack() }
+            )
         }
         composable(Routes.PAYMENTS) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("studentId") ?: ""
             PaymentsScreen(id) { _, _ -> }
         }
-        composable(Routes.HOSTEL) { HostelScreen() }
+        composable(Routes.HOSTEL) { 
+            HostelScreen(
+                onBack = { navController.popBackStack() },
+                onViewHostels = { navController.navigate(Routes.HOSTEL_ROOMS) },
+                onAllocateStudent = { navController.navigate(Routes.HOSTEL_ALLOCATION) }
+            )
+        }
+        composable(Routes.HOSTEL_ROOMS) {
+            HostelRoomsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.HOSTEL_ALLOCATION) {
+            HostelAllocationScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.STUDENT_DASHBOARD) {
+            StudentDashboard(
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onNavigateToAttendance = { /* Navigate to attendance */ },
+                onNavigateToMarks = { navController.navigate(Routes.VIEW_EXAM_RECORDS) },
+                onNavigateToFees = { navController.navigate(Routes.PAYMENTS) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
+        composable(Routes.ADMISSION_DASHBOARD) {
+            AdmissionStaffDashboard(
+                onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) },
+                onNavigateToStudents = { navController.navigate(Routes.STUDENT_LIST) },
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
+        composable(Routes.HOSTEL_DASHBOARD) {
+            HostelStaffDashboard(
+                onNavigateToHostel = { navController.navigate(Routes.HOSTEL) },
+                onNavigateToRooms = { navController.navigate(Routes.HOSTEL_ROOMS) },
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
+        composable(Routes.ACCOUNTS_DASHBOARD) {
+            AccountsStaffDashboard(
+                onNavigateToPayments = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
+        composable(Routes.EXAM_DASHBOARD) {
+            ExamStaffDashboard(
+                onNavigateToExams = { navController.navigate(Routes.EXAMS) },
+                onNavigateToMarks = { navController.navigate(Routes.ADD_UPDATE_MARKS) },
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
         composable(Routes.DASHBOARD) { 
             DashboardScreen(
                 onNavigateToPayments = { navController.navigate(Routes.PAYMENTS) },
                 onNavigateToHostel = { navController.navigate(Routes.HOSTEL) },
-                onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) }
+                onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) },
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onNavigateToExams = { navController.navigate(Routes.EXAMS) },
+                onNavigateToStudents = { navController.navigate(Routes.STUDENT_LIST) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
             )
         }
-        composable(Routes.EXAMS) { ExamScreen() }
+        composable(Routes.EXAMS) { 
+            ExamScreen(
+                onBack = { navController.popBackStack() },
+                onViewExamRecords = { navController.navigate(Routes.VIEW_EXAM_RECORDS) },
+                onAddUpdateMarks = { navController.navigate(Routes.ADD_UPDATE_MARKS) }
+            )
+        }
+        composable(Routes.VIEW_EXAM_RECORDS) {
+            ViewStudentExamRecordsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.ADD_UPDATE_MARKS) {
+            AddUpdateMarksScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable(Routes.PROFILE) { 
             ProfileScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onEditProfile = { navController.navigate(Routes.PERSONAL_DETAILS) },
+                onSignOut = {
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
+        composable(Routes.PERSONAL_DETAILS) {
+            PersonalDetailsScreen(
+                onBack = { navController.popBackStack() },
+                onNextStep = { /* Navigate to next step */ }
             )
         }
     }

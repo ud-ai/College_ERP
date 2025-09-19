@@ -2,7 +2,6 @@ package com.example.collegeerp.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -10,30 +9,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.collegeerp.ui.DashboardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(
-    onNavigateToPayments: () -> Unit = {},
+fun HostelStaffDashboard(
     onNavigateToHostel: () -> Unit = {},
-    onNavigateToAdmissions: () -> Unit = {},
+    onNavigateToRooms: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToExams: () -> Unit = {},
-    onNavigateToStudents: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
-    val viewModel: DashboardViewModel = hiltViewModel()
-    val kpis = viewModel.kpis.collectAsState().value
-    
     Scaffold(
-        bottomBar = { BottomNavigation(onNavigateToProfile = onNavigateToProfile) }
+        bottomBar = { 
+            HostelBottomNavigation(
+                onNavigateToProfile = onNavigateToProfile,
+                onSignOut = onSignOut
+            ) 
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -41,11 +35,11 @@ fun DashboardScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            // Header with blue background
+            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF2196F3))
+                    .background(Color(0xFF9C27B0))
                     .padding(16.dp)
             ) {
                 Row(
@@ -61,7 +55,7 @@ fun DashboardScreen(
                     )
                     
                     Text(
-                        text = "Dashboard",
+                        text = "Hostel Department",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -76,21 +70,21 @@ fun DashboardScreen(
                 }
             }
             
-            // Content with padding
+            // Content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Quick Access",
+                    text = "Hostel Management",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF333333),
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
                 
-                // Grid of cards - 3x2
+                // Hostel specific cards
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -98,55 +92,40 @@ fun DashboardScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        QuickAccessCard(
-                            title = "Admissions",
-                            icon = Icons.Default.Star,
-                            color = Color(0xFF4CAF50),
-                            onClick = onNavigateToAdmissions,
-                            modifier = Modifier.weight(1f)
-                        )
-                        QuickAccessCard(
-                            title = "Students",
-                            icon = Icons.Default.Person,
-                            color = Color(0xFF2196F3),
-                            onClick = onNavigateToStudents,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        QuickAccessCard(
-                            title = "Fees",
-                            icon = Icons.Default.AccountBox,
-                            color = Color(0xFFFF9800),
-                            onClick = onNavigateToPayments,
-                            modifier = Modifier.weight(1f)
-                        )
-                        QuickAccessCard(
-                            title = "Hostel",
+                        DepartmentQuickAccessCard(
+                            title = "Room Allocation",
                             icon = Icons.Default.Home,
                             color = Color(0xFF9C27B0),
                             onClick = onNavigateToHostel,
                             modifier = Modifier.weight(1f)
                         )
+                        DepartmentQuickAccessCard(
+                            title = "Room Status",
+                            icon = Icons.Default.Info,
+                            color = Color(0xFF2196F3),
+                            onClick = onNavigateToRooms,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        QuickAccessCard(
-                            title = "Exams",
-                            icon = Icons.Default.Edit,
-                            color = Color(0xFFF44336),
-                            onClick = onNavigateToExams,
+                        DepartmentQuickAccessCard(
+                            title = "Maintenance",
+                            icon = Icons.Default.Build,
+                            color = Color(0xFFFF9800),
+                            onClick = { },
                             modifier = Modifier.weight(1f)
                         )
-                        // Empty space for symmetry
-                        Spacer(modifier = Modifier.weight(1f))
+                        DepartmentQuickAccessCard(
+                            title = "Reports",
+                            icon = Icons.Default.DateRange,
+                            color = Color(0xFF4CAF50),
+                            onClick = { },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
@@ -155,62 +134,9 @@ fun DashboardScreen(
 }
 
 @Composable
-fun QuickAccessCard(
-    title: String,
-    icon: ImageVector,
-    color: Color,
-    onClick: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier
-            .height(140.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .background(
-                        color = color.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(16.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(
-                text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF333333),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-@Composable
-fun BottomNavigation(
-    onNavigateToProfile: () -> Unit = {}
+fun HostelBottomNavigation(
+    onNavigateToProfile: () -> Unit = {},
+    onSignOut: () -> Unit = {}
 ) {
     NavigationBar(
         containerColor = Color.White,
@@ -226,39 +152,39 @@ fun BottomNavigation(
             selected = true,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF2196F3),
+                selectedIconColor = Color(0xFF9C27B0),
                 unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF2196F3).copy(alpha = 0.12f)
+                indicatorColor = Color(0xFF9C27B0).copy(alpha = 0.12f)
+            )
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    Icons.Default.Build,
+                    contentDescription = "Maintenance"
+                )
+            },
+            selected = false,
+            onClick = { },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF9C27B0),
+                unselectedIconColor = Color(0xFF999999),
+                indicatorColor = Color(0xFF9C27B0).copy(alpha = 0.12f)
             )
         )
         NavigationBarItem(
             icon = {
                 Icon(
                     Icons.Default.DateRange,
-                    contentDescription = "Schedule"
+                    contentDescription = "Reports"
                 )
             },
             selected = false,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF2196F3),
+                selectedIconColor = Color(0xFF9C27B0),
                 unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF2196F3).copy(alpha = 0.12f)
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Notifications,
-                    contentDescription = "Notifications"
-                )
-            },
-            selected = false,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF2196F3),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF2196F3).copy(alpha = 0.12f)
+                indicatorColor = Color(0xFF9C27B0).copy(alpha = 0.12f)
             )
         )
         NavigationBarItem(
@@ -271,14 +197,10 @@ fun BottomNavigation(
             selected = false,
             onClick = onNavigateToProfile,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF2196F3),
+                selectedIconColor = Color(0xFF9C27B0),
                 unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF2196F3).copy(alpha = 0.12f)
+                indicatorColor = Color(0xFF9C27B0).copy(alpha = 0.12f)
             )
         )
     }
 }
-
-
-
-

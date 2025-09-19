@@ -1,38 +1,29 @@
 package com.example.collegeerp.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.collegeerp.R
 import com.example.collegeerp.ui.AuthViewModel
+import com.example.collegeerp.ui.components.CampusConnectLogo
 import android.util.Patterns
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun AuthScreen(
@@ -43,222 +34,513 @@ fun AuthScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    var selectedRole by remember { mutableStateOf("Student") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showForgotPassword by remember { mutableStateOf(false) }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Column(
+    if (showForgotPassword) {
+        ForgotPasswordScreen(
+            onBack = { showForgotPassword = false },
+            onResetSent = { showForgotPassword = false }
+        )
+    } else {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(top = 60.dp, bottom = 24.dp)
-                .align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .background(Color(0xFFF5F5F5))
         ) {
-            // Logo or App Name
-            Text(
-                text = "College ERP",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
-            
-            // Card for login/signup form
-            Card(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Title
-                    Text(
-                        text = if (isLogin) "Sign In" else "Create Account",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 24.dp)
-                    )
-                    
-                    // Name field (only for signup)
-                    AnimatedVisibility(
-                        visible = !isLogin,
-                        enter = fadeIn() + slideInVertically(),
-                        exit = fadeOut() + slideOutVertically()
-                    ) {
-                        OutlinedTextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            label = { Text("Full Name") },
-                            leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Name") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Next
-                            )
-                        )
-                    }
-                    
-                    // Email field
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Email") },
-                        leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-                    
-                    // Password field
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Password") },
-                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Password") },
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    painter = painterResource(id = if (passwordVisible) android.R.drawable.ic_menu_view else android.R.drawable.ic_menu_view),
-                                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                                )
-                            }
-                        },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                            imeAction = ImeAction.Done
-                        )
-                    )
-                    
-                    // Error message
-                    AnimatedVisibility(visible = errorMessage != null) {
-                        Text(
-                            text = errorMessage ?: "",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                    }
-                    
-                    // Sign in/up button
-                    Button(
-                        onClick = {
+                Spacer(modifier = Modifier.weight(1f))
+                
+                if (isLogin) {
+                    LoginForm(
+                        email = email,
+                        password = password,
+                        isLoading = isLoading,
+                        errorMessage = errorMessage,
+                        onEmailChange = { email = it },
+                        onPasswordChange = { password = it },
+                        onForgotPassword = { showForgotPassword = true },
+                        onSignIn = {
                             isLoading = true
                             errorMessage = null
                             
-                            if (isLogin) {
-                                // Validate email and password
-                                if (!isValidEmail(email)) {
-                                    errorMessage = "Please enter a valid email address"
-                                    isLoading = false
-                                    return@Button
-                                }
-                                
-                                if (password.length < 6) {
-                                    errorMessage = "Password must be at least 6 characters"
-                                    isLoading = false
-                                    return@Button
-                                }
-                                
-                                viewModel.signIn(email, password) { success, error ->
-                                    isLoading = false
-                                    if (success) {
-                                        onSignIn(email, password)
-                                    } else {
-                                        errorMessage = error ?: "Sign in failed. Please check your credentials and ensure Firebase emulators are running."
-                                    }
-                                }
-                            } else {
-                                if (name.isBlank()) {
-                                    errorMessage = "Please enter your name"
-                                    isLoading = false
-                                    return@Button
-                                }
-                                
-                                if (!isValidEmail(email)) {
-                                    errorMessage = "Please enter a valid email address"
-                                    isLoading = false
-                                    return@Button
-                                }
-                                
-                                if (password.length < 6) {
-                                    errorMessage = "Password must be at least 6 characters"
-                                    isLoading = false
-                                    return@Button
-                                }
-                                
-                                viewModel.signUp(email, password, name) { success ->
-                                    isLoading = false
-                                    if (success) {
-                                        // Auto login after signup
-                                        viewModel.signIn(email, password) { loginSuccess, loginError ->
-                                            if (loginSuccess) {
-                                                onSignIn(email, password)
-                                            } else {
-                                                errorMessage = loginError ?: "Auto-login failed after signup"
-                                            }
-                                        }
-                                    } else {
-                                        errorMessage = "Failed to create account. The email may already be in use or there might be network issues. Please check your internet connection and try again."
-                                    }
+                            if (!isValidEmail(email)) {
+                                errorMessage = "Please enter a valid email address"
+                                isLoading = false
+                                return@LoginForm
+                            }
+                            
+                            if (password.length < 6) {
+                                errorMessage = "Password must be at least 6 characters"
+                                isLoading = false
+                                return@LoginForm
+                            }
+                            
+                            viewModel.signIn(email, password) { success, error ->
+                                isLoading = false
+                                if (success) {
+                                    onSignIn(email, password)
+                                } else {
+                                    errorMessage = error ?: "Sign in failed. Please check your credentials."
                                 }
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        enabled = !isLoading && email.isNotBlank() && password.isNotBlank() && 
-                                 (isLogin || (!isLogin && name.isNotBlank()))
-                    ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(text = if (isLogin) "Sign In" else "Create Account")
                         }
+                    )
+                } else {
+                    SignUpForm(
+                        name = name,
+                        email = email,
+                        password = password,
+                        selectedRole = selectedRole,
+                        isLoading = isLoading,
+                        errorMessage = errorMessage,
+                        onNameChange = { name = it },
+                        onEmailChange = { email = it },
+                        onPasswordChange = { password = it },
+                        onRoleChange = { selectedRole = it },
+                        onSignUp = {
+                            isLoading = true
+                            errorMessage = null
+                            
+                            if (name.isBlank()) {
+                                errorMessage = "Please enter your name"
+                                isLoading = false
+                                return@SignUpForm
+                            }
+                            
+                            if (!isValidEmail(email)) {
+                                errorMessage = "Please enter a valid email address"
+                                isLoading = false
+                                return@SignUpForm
+                            }
+                            
+                            if (password.length < 6) {
+                                errorMessage = "Password must be at least 6 characters"
+                                isLoading = false
+                                return@SignUpForm
+                            }
+                            
+                            viewModel.signUp(email, password, name, selectedRole) { success ->
+                                isLoading = false
+                                if (success) {
+                                    viewModel.signIn(email, password) { loginSuccess, _ ->
+                                        if (loginSuccess) {
+                                            onSignIn(email, password)
+                                        }
+                                    }
+                                } else {
+                                    errorMessage = "Failed to create account. Please try again."
+                                }
+                            }
+                        }
+                    )
+                }
+                
+                // Toggle between login and signup
+                TextButton(
+                    onClick = { 
+                        isLogin = !isLogin
+                        errorMessage = null
+                    },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text(
+                        text = if (isLogin) "Don't have an account? Sign Up" else "Already have an account? Log in",
+                        color = Color(0xFF2196F3),
+                        fontSize = 14.sp
+                    )
+                }
+                
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+fun LoginForm(
+    email: String,
+    password: String,
+    isLoading: Boolean,
+    errorMessage: String?,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onForgotPassword: () -> Unit,
+    onSignIn: () -> Unit
+) {
+    CampusConnectLogo(
+        modifier = Modifier.padding(bottom = 8.dp)
+    )
+    
+    Text(
+        text = "Sign in to your account",
+        fontSize = 16.sp,
+        color = Color(0xFF666666),
+        modifier = Modifier.padding(bottom = 48.dp)
+    )
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Text(
+                text = "Email address",
+                fontSize = 14.sp,
+                color = Color(0xFF2C2C2C),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            OutlinedTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                placeholder = { Text("you@example.com", color = Color(0xFFBBBBBB)) },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFE0E0E0),
+                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+            
+            Text(
+                text = "Password",
+                fontSize = 14.sp,
+                color = Color(0xFF2C2C2C),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            OutlinedTextField(
+                value = password,
+                onValueChange = onPasswordChange,
+                placeholder = { Text("••••••••", color = Color(0xFFBBBBBB)) },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFE0E0E0),
+                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+            
+            TextButton(
+                onClick = onForgotPassword,
+                modifier = Modifier.align(Alignment.End).padding(bottom = 32.dp)
+            ) {
+                Text(
+                    text = "Forgot your password?",
+                    color = Color(0xFF2196F3),
+                    fontSize = 14.sp
+                )
+            }
+            
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    color = Color(0xFFE53E3E),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+            
+            Button(
+                onClick = onSignIn,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                shape = RoundedCornerShape(8.dp),
+                enabled = !isLoading && email.isNotBlank() && password.isNotBlank()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Sign in",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SignUpForm(
+    name: String,
+    email: String,
+    password: String,
+    selectedRole: String,
+    isLoading: Boolean,
+    errorMessage: String?,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onRoleChange: (String) -> Unit,
+    onSignUp: () -> Unit
+) {
+    Text(
+        text = "Sign Up",
+        fontSize = 36.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color(0xFF2C2C2C),
+        modifier = Modifier.padding(bottom = 48.dp)
+    )
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(32.dp)
+        ) {
+            OutlinedTextField(
+                value = name,
+                onValueChange = onNameChange,
+                placeholder = { Text("Full Name", color = Color(0xFFBBBBBB)) },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFE0E0E0),
+                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+            
+            OutlinedTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                placeholder = { Text("Email", color = Color(0xFFBBBBBB)) },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFE0E0E0),
+                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+            
+            OutlinedTextField(
+                value = password,
+                onValueChange = onPasswordChange,
+                placeholder = { Text("Password", color = Color(0xFFBBBBBB)) },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFE0E0E0),
+                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+            
+            var expanded by remember { mutableStateOf(false) }
+            val roles = listOf("Student", "Admission Cell", "Accounts", "Hostel Manager", "Exam Staff", "Admin")
+            
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)
+            ) {
+                OutlinedTextField(
+                    value = selectedRole,
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = { Text("Select your role", color = Color(0xFFBBBBBB)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFFE0E0E0),
+                        unfocusedBorderColor = Color(0xFFE0E0E0)
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    roles.forEach { role ->
+                        DropdownMenuItem(
+                            text = { Text(role) },
+                            onClick = {
+                                onRoleChange(role)
+                                expanded = false
+                            }
+                        )
                     }
                 }
             }
             
-            // Toggle between login and signup
-            TextButton(
-                onClick = { 
-                    isLogin = !isLogin
-                    errorMessage = null
-                },
-                modifier = Modifier.padding(top = 16.dp)
-            ) {
+            if (errorMessage != null) {
                 Text(
-                    text = if (isLogin) "Don't have an account? Sign Up" else "Already have an account? Sign In",
-                    color = MaterialTheme.colorScheme.primary
+                    text = errorMessage,
+                    color = Color(0xFFE53E3E),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
+            }
+            
+            Button(
+                onClick = onSignUp,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                shape = RoundedCornerShape(8.dp),
+                enabled = !isLoading && name.isNotBlank() && email.isNotBlank() && password.isNotBlank()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Sign Up",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ForgotPasswordScreen(
+    onBack: () -> Unit,
+    onResetSent: () -> Unit
+) {
+    var email by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var message by remember { mutableStateOf<String?>(null) }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Reset Password",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF2C2C2C),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Enter your email to receive reset instructions",
+                fontSize = 16.sp,
+                color = Color(0xFF666666),
+                modifier = Modifier.padding(bottom = 32.dp),
+                textAlign = TextAlign.Center
+            )
+            
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp)
+                ) {
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        placeholder = { Text("Enter your email", color = Color(0xFFBBBBBB)) },
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFFE0E0E0),
+                            unfocusedBorderColor = Color(0xFFE0E0E0)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    
+                    if (message != null) {
+                        Text(
+                            text = message!!,
+                            color = if (message!!.contains("sent")) Color(0xFF4CAF50) else Color(0xFFE53E3E),
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
+                    
+                    Button(
+                        onClick = {
+                            if (isValidEmail(email)) {
+                                isLoading = true
+                                // Simulate password reset
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    delay(2000)
+                                    isLoading = false
+                                    message = "Password reset instructions sent to your email"
+                                }
+                            } else {
+                                message = "Please enter a valid email address"
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+                        shape = RoundedCornerShape(8.dp),
+                        enabled = !isLoading && email.isNotBlank()
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(
+                                text = "Send Reset Link",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                    
+                    TextButton(
+                        onClick = onBack,
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                    ) {
+                        Text(
+                            text = "Back to Sign In",
+                            color = Color(0xFF2196F3),
+                            fontSize = 14.sp
+                        )
+                    }
+                }
             }
         }
     }

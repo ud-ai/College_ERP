@@ -1,141 +1,179 @@
 package com.example.collegeerp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.collegeerp.ui.AdmissionsViewModel
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun AdmissionsScreen(onSubmit: (fullName: String, program: String) -> Unit) {
-    val viewModel: AdmissionsViewModel = hiltViewModel()
-    var name by remember { mutableStateOf("") }
-    var program by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var guardianName by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var successMessage by remember { mutableStateOf<String?>(null) }
-    
-    val photoData: ByteArray? = null // TODO: add camera/gallery picker
-    
+fun AdmissionsScreen(
+    onSubmit: (String, String) -> Unit = { _, _ -> },
+    onBack: () -> Unit = {},
+    onStartNewAdmission: () -> Unit = {},
+    onViewPending: () -> Unit = {},
+    onSearchAdmissions: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color(0xFFF5F5F5))
     ) {
-        Text(
-            text = "Student Admission Form",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-        
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Full Name *") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            isError = name.isBlank() && errorMessage != null
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = program,
-            onValueChange = { program = it },
-            label = { Text("Program *") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            placeholder = { Text("e.g., BSc Computer Science") },
-            isError = program.isBlank() && errorMessage != null
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = phone,
-            onValueChange = { phone = it },
-            label = { Text("Contact Phone") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = guardianName,
-            onValueChange = { guardianName = it },
-            label = { Text("Guardian Name") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Error message
-        errorMessage?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
-        
-        // Success message
-        successMessage?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
-        
-        Button(
-            onClick = {
-                if (name.isBlank() || program.isBlank()) {
-                    errorMessage = "Please fill in all required fields"
-                    return@Button
-                }
-                
-                isLoading = true
-                errorMessage = null
-                
-                try {
-                    viewModel.submitAdmission(name, program, photoData)
-                    onSubmit(name, program)
-                    successMessage = "Admission submitted successfully!"
-                    // Clear form
-                    name = ""
-                    program = ""
-                    phone = ""
-                    guardianName = ""
-                } catch (e: Exception) {
-                    errorMessage = "Failed to submit admission: ${e.message}"
-                } finally {
-                    isLoading = false
-                }
-            },
-            enabled = !isLoading && name.isNotBlank() && program.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
+        // Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    strokeWidth = 2.dp
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color(0xFF2C2C2C)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
             }
-            Text("Submit Admission")
+            
+            Text(
+                text = "Admissions",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF2C2C2C),
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        
+        // Content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Start New Admission
+            AdmissionOptionCard(
+                icon = Icons.Default.Add,
+                title = "Start New Admission",
+                description = "Begin a new application process.",
+                iconColor = Color(0xFF2196F3),
+                onClick = onStartNewAdmission
+            )
+            
+            // View Pending Admissions
+            AdmissionOptionCard(
+                icon = Icons.Default.Info,
+                title = "View Pending Admissions",
+                description = "Check the status of ongoing applications.",
+                iconColor = Color(0xFF2196F3),
+                onClick = onViewPending
+            )
+            
+            // Search Admissions
+            AdmissionOptionCard(
+                icon = Icons.Default.Search,
+                title = "Search Admissions",
+                description = "Find a specific admission record.",
+                iconColor = Color(0xFF2196F3),
+                onClick = onSearchAdmissions
+            )
+            
+            Spacer(modifier = Modifier.weight(1f))
+            
+            // Contact Support Button
+            Button(
+                onClick = { /* Contact support */ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .padding(bottom = 16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2196F3)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = "Contact Support",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AdmissionOptionCard(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    iconColor: Color,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = iconColor.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp)
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF2C2C2C)
+                )
+                Text(
+                    text = description,
+                    fontSize = 14.sp,
+                    color = Color(0xFF666666),
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+            
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = null,
+                tint = Color(0xFF666666),
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }

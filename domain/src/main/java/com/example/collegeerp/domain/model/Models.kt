@@ -3,7 +3,14 @@ package com.example.collegeerp.domain.model
 import java.util.Date
 
 /** Roles supported by the app for RBAC. */
-enum class UserRole { ADMIN, STAFF, STUDENT }
+enum class UserRole { 
+    STUDENT,           // Student login - profile, attendance, marks, fees
+    ADMISSION_CELL,    // Admission cell - manage new admissions
+    ACCOUNTS,          // Accounts department - manage fees and payments
+    HOSTEL_MANAGER,    // Hostel manager - manage hostel operations
+    EXAM_STAFF,        // Exam department - manage exams and marks
+    ADMIN              // Full access to everything
+}
 
 data class AppUser(
     val uid: String,
