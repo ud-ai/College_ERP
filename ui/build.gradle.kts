@@ -1,6 +1,7 @@
 plugins {
 	alias(libs.plugins.android.library)
 	alias(libs.plugins.kotlin.android)
+	alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -8,7 +9,7 @@ android {
 	compileSdk = 34
 
 	defaultConfig {
-		minSdk = 21
+		minSdk = 23
 	}
 
 	buildFeatures { compose = true }
@@ -22,10 +23,20 @@ android {
 }
 
 dependencies {
+	implementation(project(":data"))
+	implementation(project(":domain"))
+
 	implementation(platform(libs.compose.bom))
 	implementation(libs.compose.ui)
 	implementation(libs.compose.ui.graphics)
 	implementation(libs.compose.ui.tooling.preview)
 	implementation(libs.compose.material3)
 	implementation(libs.activity.compose)
+
+	implementation(libs.androidx.core.ktx)
+	implementation(libs.androidx.lifecycle.runtime)
+	implementation(libs.androidx.lifecycle.viewmodel)
+
+	implementation(libs.room.runtime)
+	implementation(libs.room.ktx)
 }

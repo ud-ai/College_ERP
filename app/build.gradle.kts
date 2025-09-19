@@ -3,6 +3,8 @@ plugins {
 	alias(libs.plugins.kotlin.android)
 	alias(libs.plugins.ksp)
 	alias(libs.plugins.hilt)
+	alias(libs.plugins.compose.compiler)
+	alias(libs.plugins.gms.google.services)
 }
 
 android {
@@ -11,7 +13,7 @@ android {
 
 	defaultConfig {
 		applicationId = "com.example.collegeerp"
-		minSdk = 21
+		minSdk = 23
 		targetSdk = 34
 		versionCode = 1
 		versionName = "1.0"
@@ -27,10 +29,15 @@ android {
 				"proguard-rules.pro"
 			)
 		}
+		debug {
+			isMinifyEnabled = false
+			isShrinkResources = false
+		}
 	}
 
 	buildFeatures {
 		compose = true
+		buildConfig = false
 	}
 
 	composeOptions {
@@ -66,6 +73,11 @@ dependencies {
 
 	implementation(libs.hilt.android)
 	ksp(libs.hilt.compiler)
+	implementation(libs.hilt.navigation.compose)
+
+	implementation(libs.room.runtime)
+	implementation(libs.room.ktx)
+	ksp(libs.room.compiler)
 
 	implementation(platform(libs.firebase.bom))
 	implementation(libs.firebase.auth)
@@ -74,6 +86,9 @@ dependencies {
 
 	implementation(libs.coil.compose)
 	implementation(libs.mpandroidchart)
+
+	implementation(libs.kotlinx.coroutines.core)
+	implementation(libs.kotlinx.coroutines.android)
 
 	testImplementation(libs.junit)
 	testImplementation(libs.mockk)
@@ -86,5 +101,3 @@ dependencies {
 	debugImplementation(libs.compose.ui.tooling)
 	debugImplementation(libs.compose.ui.test.manifest)
 }
-
-apply(plugin = "com.google.gms.google-services")

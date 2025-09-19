@@ -21,7 +21,19 @@ object FirebaseModule {
     @Provides
     @Singleton
     fun provideFirebaseApp(application: Application): FirebaseApp {
-        return FirebaseApp.initializeApp(application) ?: FirebaseApp.getInstance()
+        return try {
+            // Check if Firebase is already initialized
+            FirebaseApp.getInstance()
+        } catch (e: IllegalStateException) {
+            try {
+                // If not, try to initialize it
+                val app = FirebaseApp.initializeApp(application)
+                app ?: FirebaseApp.getInstance()
+            } catch (e: Exception) {
+                // If initialization fails completely, throw a clearer error
+                throw IllegalStateException("Failed to initialize Firebase. Check google-services.json file.", e)
+            }
+        }
     }
 
     @Provides

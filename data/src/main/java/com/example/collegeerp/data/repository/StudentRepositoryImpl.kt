@@ -1,9 +1,11 @@
 package com.example.collegeerp.data.repository
 
 import com.example.collegeerp.data.local.AppDatabase
-import com.example.collegeerp.data.local.entity.StudentEntity
+import com.example.collegeerp.data.local.entity.toEntity
+import com.example.collegeerp.data.local.entity.toDomain
 import com.example.collegeerp.domain.model.Student
 import com.example.collegeerp.domain.repository.StudentRepository
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -11,7 +13,8 @@ import javax.inject.Singleton
 
 @Singleton
 class StudentRepositoryImpl @Inject constructor(
-    private val db: AppDatabase
+    private val db: AppDatabase,
+    private val firestore: FirebaseFirestore
 ) : StudentRepository {
 
     override fun observeStudents(): Flow<List<Student>> =
@@ -21,34 +24,14 @@ class StudentRepositoryImpl @Inject constructor(
         db.studentDao().observe(studentId).map { it?.toDomain() }
 
     override suspend fun upsert(student: Student) {
-        db.studentDao().upsert(student.toEntity())
-        // Firestore sync to be added in a later step
+        db.studentDao().insert(student.toEntity())
+        try {
+            firestore.collection("students").document(student.studentId).set(student)
+        } catch (e: Exception) {
+            android.util.Log.e("StudentRepository", "Failed to sync to Firestore", e)
+        }
     }
 }
 
-private fun StudentEntity.toDomain(): Student = Student(
-    studentId = studentId,
-    fullName = fullName,
-    dob = dob,
-    program = program,
-    admissionDate = admissionDate,
-    status = status,
-    photoUrl = photoUrl,
-    contactPhone = contactPhone,
-    guardianName = guardianName,
-    metadata = emptyMap()
-)
-
-private fun Student.toEntity(): StudentEntity = StudentEntity(
-    studentId = studentId,
-    fullName = fullName,
-    dob = dob,
-    program = program,
-    admissionDate = admissionDate,
-    status = status,
-    photoUrl = photoUrl,
-    contactPhone = contactPhone,
-    guardianName = guardianName
-)
 
 

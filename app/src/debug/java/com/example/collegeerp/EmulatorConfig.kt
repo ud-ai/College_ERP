@@ -9,7 +9,6 @@ import dagger.hilt.android.HiltAndroidApp
 /**
  * Debug-only: connect Firebase SDKs to local emulators if available.
  */
-@HiltAndroidApp
 class DebugCollegeErpApplication : CollegeErpApplication() {
     override fun onCreate() {
         super.onCreate()

@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
@@ -27,6 +29,7 @@ import com.example.collegeerp.ui.screens.StudentDetailScreen
 import com.example.collegeerp.ui.screens.StudentsScreen
 import com.example.collegeerp.ui.screens.ExamScreen
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.runtime.LaunchedEffect
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -45,16 +48,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
     val navController = rememberNavController()
+    val user by viewModel.currentUser.collectAsState()
 
     NavHost(navController = navController, startDestination = Routes.AUTH) {
         composable(Routes.AUTH) {
-            AuthScreen(onSignIn = { email, password -> viewModel.signIn(email, password) })
-            val user = viewModel.currentUser.value
-            if (user != null) {
-                when (user.role) {
-                    UserRole.ADMIN -> navController.navigate(Routes.ADMIN_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
-                    UserRole.STAFF -> navController.navigate(Routes.STAFF_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
-                    UserRole.STUDENT -> navController.navigate(Routes.STUDENT_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
+            AuthScreen(
+                onSignIn = { email, password -> viewModel.signIn(email, password) }
+            )
+            
+            // Handle navigation based on user role using LaunchedEffect to avoid navigating during composition
+            LaunchedEffect(user) {
+                val u = user
+                if (u != null) {
+                    when (u.role) {
+                        UserRole.ADMIN -> navController.navigate(Routes.ADMIN_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        UserRole.STAFF -> navController.navigate(Routes.STAFF_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        UserRole.STUDENT -> navController.navigate(Routes.STUDENT_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
+                    }
                 }
             }
         }
@@ -96,6 +106,7 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
 }
 
 private fun routeAllowed(viewModel: AuthViewModel, route: String): Boolean {
+    // This function is not used in composition, so .value is acceptable here
     val role = viewModel.currentUser.value?.role ?: return false
     return RolePermissions.allowedRoutes(role).contains(route)
 }

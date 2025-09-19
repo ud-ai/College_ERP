@@ -20,7 +20,27 @@ class AuthViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun signIn(email: String, password: String) {
-        viewModelScope.launch { authRepository.signIn(email, password) }
+        viewModelScope.launch {
+            try {
+                authRepository.signIn(email, password)
+            } catch (e: Exception) {
+                android.util.Log.e("AuthViewModel", "Sign-in failed", e)
+            }
+        }
+    }
+    
+    fun signUp(email: String, password: String, name: String, onComplete: (Boolean) -> Unit = {}) {
+        viewModelScope.launch { 
+            try {
+                android.util.Log.d("AuthViewModel", "Starting signup for email: $email")
+                authRepository.signUp(email, password, name)
+                android.util.Log.d("AuthViewModel", "Signup successful")
+                onComplete(true)
+            } catch (e: Exception) {
+                android.util.Log.e("AuthViewModel", "Signup failed for email: $email", e)
+                onComplete(false)
+            }
+        }
     }
 
     fun signOut() {

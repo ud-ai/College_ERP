@@ -20,9 +20,18 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "college_erp.db"
+            AppDatabase.DATABASE_NAME
         ).fallbackToDestructiveMigration().build()
     }
+    
+    @Provides
+    fun provideStudentDao(database: AppDatabase) = database.studentDao()
+    
+    @Provides
+    fun providePaymentDao(database: AppDatabase) = database.paymentDao()
+    
+    @Provides
+    fun provideRoomDao(database: AppDatabase) = database.roomDao()
 }
 
 

@@ -10,6 +10,9 @@ import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import java.util.UUID
 import javax.inject.Inject
 
@@ -68,9 +71,9 @@ class PaymentsViewModel @Inject constructor(
 }
 
 private suspend fun <T> com.google.android.gms.tasks.Task<T>.await(): T {
-    return kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+    return suspendCancellableCoroutine { cont ->
         addOnCompleteListener { task ->
-            if (task.isSuccessful) cont.resume(task.result, null)
+            if (task.isSuccessful) cont.resume(task.result)
             else cont.resumeWithException(task.exception ?: RuntimeException("Task failed"))
         }
     }

@@ -1,22 +1,27 @@
 package com.example.collegeerp
 
 import android.app.Application
+import android.content.Context
 import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
-import com.example.collegeerp.data.sync.WriteQueueSyncer
-import com.example.collegeerp.data.sync.RealtimeMirror
+// Temporarily removed Firebase-dependent imports
+// import javax.inject.Inject
+// import com.example.collegeerp.data.sync.WriteQueueSyncer
+// import com.example.collegeerp.data.sync.RealtimeMirror
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import com.google.firebase.FirebaseApp
 
 @HiltAndroidApp
-class CollegeErpApplication : Application() {
-    @Inject lateinit var writeQueueSyncer: WriteQueueSyncer
-    @Inject lateinit var realtimeMirror: RealtimeMirror
+open class CollegeErpApplication : Application() {
+    // Temporarily removed Firebase-dependent services
+    // @Inject lateinit var writeQueueSyncer: WriteQueueSyncer
+    // @Inject lateinit var realtimeMirror: RealtimeMirror
     private val appScope = CoroutineScope(SupervisorJob())
 
     override fun onCreate() {
         super.onCreate()
-        writeQueueSyncer.start(appScope)
-        realtimeMirror.start(appScope)
+        // Temporarily disabled Firebase-dependent services
+        // writeQueueSyncer.start(appScope)
+        // realtimeMirror.start(appScope)
     }
 }

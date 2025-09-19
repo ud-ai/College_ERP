@@ -30,7 +30,7 @@ private fun ExamRecordEntity.toDomain(): ExamRecord = ExamRecord(
 )
 
 private fun ExamRecord.toEntity(): ExamRecordEntity = ExamRecordEntity(
-    key = "$examId_$studentId",
+    key = "$examId$studentId",
     examId = examId,
     studentId = studentId,
     grade = grade,
