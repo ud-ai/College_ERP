@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.sp
 fun AdmissionStaffDashboard(
     onNavigateToAdmissions: () -> Unit = {},
     onNavigateToStudents: () -> Unit = {},
+    onNavigateToPendingApplications: () -> Unit = {},
+    onNavigateToReports: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
@@ -28,6 +30,8 @@ fun AdmissionStaffDashboard(
         bottomBar = { 
             StaffBottomNavigation(
                 onNavigateToProfile = onNavigateToProfile,
+                onNavigateToAdmissions = onNavigateToAdmissions,
+                onNavigateToStudents = onNavigateToStudents,
                 onSignOut = onSignOut
             ) 
         }
@@ -119,14 +123,14 @@ fun AdmissionStaffDashboard(
                             title = "Pending Applications",
                             icon = Icons.Default.Notifications,
                             color = Color(0xFFFF9800),
-                            onClick = { },
+                            onClick = onNavigateToPendingApplications,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
                             title = "Reports",
                             icon = Icons.Default.Info,
                             color = Color(0xFF9C27B0),
-                            onClick = { },
+                            onClick = onNavigateToReports,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -193,6 +197,8 @@ fun DepartmentQuickAccessCard(
 @Composable
 fun StaffBottomNavigation(
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToAdmissions: () -> Unit = {},
+    onNavigateToStudents: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
     NavigationBar(
@@ -217,27 +223,12 @@ fun StaffBottomNavigation(
         NavigationBarItem(
             icon = {
                 Icon(
-                    Icons.Default.Notifications,
-                    contentDescription = "Notifications"
+                    Icons.Default.Add,
+                    contentDescription = "Admissions"
                 )
             },
             selected = false,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF4CAF50),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF4CAF50).copy(alpha = 0.12f)
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = "Reports"
-                )
-            },
-            selected = false,
-            onClick = { },
+            onClick = onNavigateToAdmissions,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF4CAF50),
                 unselectedIconColor = Color(0xFF999999),
@@ -248,6 +239,21 @@ fun StaffBottomNavigation(
             icon = {
                 Icon(
                     Icons.Default.Person,
+                    contentDescription = "Students"
+                )
+            },
+            selected = false,
+            onClick = onNavigateToStudents,
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFF4CAF50),
+                unselectedIconColor = Color(0xFF999999),
+                indicatorColor = Color(0xFF4CAF50).copy(alpha = 0.12f)
+            )
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(
+                    Icons.Default.AccountCircle,
                     contentDescription = "Profile"
                 )
             },

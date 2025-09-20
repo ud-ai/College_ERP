@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.collegeerp.ui.AuthViewModel
 import com.example.collegeerp.ui.components.CampusConnectLogo
+import com.example.collegeerp.ui.components.ThemeToggleButton
 import android.util.Patterns
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun AuthScreen(
     onSignIn: (String, String) -> Unit,
+    isDarkMode: Boolean = false,
+    onThemeToggle: (Boolean) -> Unit = {},
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     var isLogin by remember { mutableStateOf(true) }
@@ -48,8 +51,16 @@ fun AuthScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(MaterialTheme.colorScheme.background)
         ) {
+            // Theme toggle button in top-right corner
+            ThemeToggleButton(
+                isDarkMode = isDarkMode,
+                onToggle = onThemeToggle,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -128,16 +139,16 @@ fun AuthScreen(
                                 return@SignUpForm
                             }
                             
-                            viewModel.signUp(email, password, name, selectedRole) { success ->
+                            viewModel.signUp(email, password, name, selectedRole) { success, error ->
                                 isLoading = false
                                 if (success) {
-                                    viewModel.signIn(email, password) { loginSuccess, _ ->
-                                        if (loginSuccess) {
-                                            onSignIn(email, password)
-                                        }
-                                    }
+                                    // Switch to login and clear signup form only
+                                    name = ""
+                                    selectedRole = "Student"
+                                    isLogin = true
+                                    errorMessage = "Account created successfully. Please sign in."
                                 } else {
-                                    errorMessage = "Failed to create account. Please try again."
+                                    errorMessage = error ?: "Failed to create account. Please try again."
                                 }
                             }
                         }
@@ -190,7 +201,7 @@ fun LoginForm(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
@@ -199,7 +210,7 @@ fun LoginForm(
             Text(
                 text = "Email address",
                 fontSize = 14.sp,
-                color = Color(0xFF2C2C2C),
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             
@@ -210,8 +221,10 @@ fun LoginForm(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFE0E0E0),
-                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             )
@@ -219,7 +232,7 @@ fun LoginForm(
             Text(
                 text = "Password",
                 fontSize = 14.sp,
-                color = Color(0xFF2C2C2C),
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             
@@ -231,8 +244,10 @@ fun LoginForm(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFE0E0E0),
-                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             )
@@ -309,7 +324,7 @@ fun SignUpForm(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
@@ -322,8 +337,10 @@ fun SignUpForm(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFE0E0E0),
-                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             )
@@ -335,8 +352,10 @@ fun SignUpForm(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFE0E0E0),
-                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             )
@@ -349,8 +368,10 @@ fun SignUpForm(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFFE0E0E0),
-                    unfocusedBorderColor = Color(0xFFE0E0E0)
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             )
@@ -371,8 +392,10 @@ fun SignUpForm(
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.menuAnchor().fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFE0E0E0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                     ),
                     shape = RoundedCornerShape(8.dp)
                 )

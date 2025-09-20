@@ -25,28 +25,7 @@ fun CampusConnectLogo(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "CAMPUS",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = campusColor,
-                letterSpacing = 2.sp
-            )
-            Text(
-                text = "CONNECT",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = connectColor,
-                letterSpacing = 2.sp
-            )
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        // WiFi Signal Icon
+        // WiFi Signal Icon only
         Canvas(
             modifier = Modifier.size(40.dp)
         ) {

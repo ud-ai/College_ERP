@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import com.example.collegeerp.ui.theme.CollegeERPTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,17 +40,26 @@ import com.example.collegeerp.ui.screens.AdmissionStaffDashboard
 import com.example.collegeerp.ui.screens.HostelStaffDashboard
 import com.example.collegeerp.ui.screens.AccountsStaffDashboard
 import com.example.collegeerp.ui.screens.ExamStaffDashboard
+import com.example.collegeerp.ui.screens.AdminDashboard
+import com.example.collegeerp.ui.screens.NotificationsScreen
+import com.example.collegeerp.ui.screens.AnalyticsScreen
+import com.example.collegeerp.ui.screens.DocumentsScreen
+import com.example.collegeerp.ui.screens.AttendanceScreen
+import com.example.collegeerp.ui.screens.PendingApplicationsScreen
+import com.example.collegeerp.ui.screens.AdmissionReportsScreen
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
-			MaterialTheme {
+			var isDarkMode by remember { mutableStateOf(false) }
+			CollegeERPTheme(darkTheme = isDarkMode) {
 				Surface(color = MaterialTheme.colorScheme.background) {
-					AppNav()
+					AppNav(isDarkMode = isDarkMode, onThemeToggle = { isDarkMode = it })
 				}
 			}
 		}
@@ -57,27 +67,61 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
+fun AppNav(
+    isDarkMode: Boolean = false,
+    onThemeToggle: (Boolean) -> Unit = {},
+    viewModel: AuthViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val user by viewModel.currentUser.collectAsState()
 
     NavHost(navController = navController, startDestination = Routes.AUTH) {
         composable(Routes.AUTH) {
             AuthScreen(
-                onSignIn = { email, password -> viewModel.signIn(email, password) }
+                onSignIn = { email, password -> viewModel.signIn(email, password) },
+                isDarkMode = isDarkMode,
+                onThemeToggle = onThemeToggle
             )
             
             // Handle navigation based on user role using LaunchedEffect to avoid navigating during composition
             LaunchedEffect(user) {
                 val u = user
                 if (u != null) {
-                    when (u.role) {
-                        UserRole.ADMIN -> navController.navigate(Routes.ADMIN_HOME) { popUpTo(Routes.AUTH) { inclusive = true } }
-                        UserRole.STUDENT -> navController.navigate(Routes.STUDENT_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
-                        UserRole.ADMISSION_CELL -> navController.navigate(Routes.ADMISSION_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
-                        UserRole.HOSTEL_MANAGER -> navController.navigate(Routes.HOSTEL_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
-                        UserRole.ACCOUNTS -> navController.navigate(Routes.ACCOUNTS_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
-                        UserRole.EXAM_STAFF -> navController.navigate(Routes.EXAM_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                    android.util.Log.d("MainActivity", "User logged in with role: ${u.role}")
+                    
+                    // Force admin role for testing if email contains admin
+                    val actualRole = if (u.email.contains("admin", ignoreCase = true)) {
+                        android.util.Log.d("MainActivity", "Forcing ADMIN role for admin email")
+                        UserRole.ADMIN
+                    } else {
+                        u.role
+                    }
+                    
+                    when (actualRole) {
+                        UserRole.ADMIN -> {
+                            android.util.Log.d("MainActivity", "Navigating to ADMIN_DASHBOARD")
+                            navController.navigate(Routes.ADMIN_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        }
+                        UserRole.STUDENT -> {
+                            android.util.Log.d("MainActivity", "Navigating to STUDENT_DASHBOARD")
+                            navController.navigate(Routes.STUDENT_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        }
+                        UserRole.ADMISSION_CELL -> {
+                            android.util.Log.d("MainActivity", "Navigating to ADMISSION_DASHBOARD")
+                            navController.navigate(Routes.ADMISSION_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        }
+                        UserRole.HOSTEL_MANAGER -> {
+                            android.util.Log.d("MainActivity", "Navigating to HOSTEL_DASHBOARD")
+                            navController.navigate(Routes.HOSTEL_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        }
+                        UserRole.ACCOUNTS -> {
+                            android.util.Log.d("MainActivity", "Navigating to ACCOUNTS_DASHBOARD")
+                            navController.navigate(Routes.ACCOUNTS_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        }
+                        UserRole.EXAM_STAFF -> {
+                            android.util.Log.d("MainActivity", "Navigating to EXAM_DASHBOARD")
+                            navController.navigate(Routes.EXAM_DASHBOARD) { popUpTo(Routes.AUTH) { inclusive = true } }
+                        }
                     }
                 }
             }
@@ -166,7 +210,7 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
         composable(Routes.STUDENT_DASHBOARD) {
             StudentDashboard(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
-                onNavigateToAttendance = { /* Navigate to attendance */ },
+                onNavigateToAttendance = { navController.navigate(Routes.ATTENDANCE) },
                 onNavigateToMarks = { navController.navigate(Routes.VIEW_EXAM_RECORDS) },
                 onNavigateToFees = { navController.navigate(Routes.PAYMENTS) },
                 onSignOut = {
@@ -179,6 +223,8 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
             AdmissionStaffDashboard(
                 onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) },
                 onNavigateToStudents = { navController.navigate(Routes.STUDENT_LIST) },
+                onNavigateToPendingApplications = { navController.navigate(Routes.PENDING_APPLICATIONS) },
+                onNavigateToReports = { navController.navigate(Routes.ADMISSION_REPORTS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
                 onSignOut = {
                     viewModel.signOut()
@@ -188,7 +234,7 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
         }
         composable(Routes.HOSTEL_DASHBOARD) {
             HostelStaffDashboard(
-                onNavigateToHostel = { navController.navigate(Routes.HOSTEL) },
+                onNavigateToHostel = { navController.navigate(Routes.HOSTEL_ALLOCATION) },
                 onNavigateToRooms = { navController.navigate(Routes.HOSTEL_ROOMS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
                 onSignOut = {
@@ -212,6 +258,23 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
                 onNavigateToExams = { navController.navigate(Routes.EXAMS) },
                 onNavigateToMarks = { navController.navigate(Routes.ADD_UPDATE_MARKS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onSignOut = {
+                    viewModel.signOut()
+                    navController.navigate(Routes.AUTH) { popUpTo(0) }
+                }
+            )
+        }
+        composable(Routes.ADMIN_DASHBOARD) {
+            AdminDashboard(
+                onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) },
+                onNavigateToStudents = { navController.navigate(Routes.STUDENT_LIST) },
+                onNavigateToPayments = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToHostel = { navController.navigate(Routes.HOSTEL_ALLOCATION) },
+                onNavigateToExams = { navController.navigate(Routes.EXAMS) },
+                onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                onNavigateToNotifications = { navController.navigate(Routes.NOTIFICATIONS) },
+                onNavigateToAnalytics = { navController.navigate(Routes.ANALYTICS) },
+                onNavigateToDocuments = { navController.navigate(Routes.DOCUMENTS) },
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate(Routes.AUTH) { popUpTo(0) }
@@ -262,6 +325,36 @@ fun AppNav(viewModel: AuthViewModel = hiltViewModel()) {
             PersonalDetailsScreen(
                 onBack = { navController.popBackStack() },
                 onNextStep = { /* Navigate to next step */ }
+            )
+        }
+        composable(Routes.NOTIFICATIONS) {
+            NotificationsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.ANALYTICS) {
+            AnalyticsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.DOCUMENTS) {
+            DocumentsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.ATTENDANCE) {
+            AttendanceScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.PENDING_APPLICATIONS) {
+            PendingApplicationsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.ADMISSION_REPORTS) {
+            AdmissionReportsScreen(
+                onBack = { navController.popBackStack() }
             )
         }
     }

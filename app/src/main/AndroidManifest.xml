@@ -6,7 +6,7 @@
 	<application
 		android:name=".CollegeErpApplication"
 		android:allowBackup="true"
-		android:label="CollegeLightERP"
+
 		android:networkSecurityConfig="@xml/network_security_config"
 		android:supportsRtl="true">
 		<activity 

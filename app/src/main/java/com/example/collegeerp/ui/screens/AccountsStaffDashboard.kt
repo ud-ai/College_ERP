@@ -24,6 +24,7 @@ fun AccountsStaffDashboard(
         bottomBar = { 
             AccountsBottomNavigation(
                 onNavigateToProfile = onNavigateToProfile,
+                onNavigateToPayments = onNavigateToPayments,
                 onSignOut = onSignOut
             ) 
         }
@@ -135,6 +136,7 @@ fun AccountsStaffDashboard(
 @Composable
 fun AccountsBottomNavigation(
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToPayments: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
     NavigationBar(
@@ -164,22 +166,7 @@ fun AccountsBottomNavigation(
                 )
             },
             selected = false,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFFFF9800),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFFFF9800).copy(alpha = 0.12f)
-            )
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    Icons.Default.Info,
-                    contentDescription = "Reports"
-                )
-            },
-            selected = false,
-            onClick = { },
+            onClick = onNavigateToPayments,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFFFF9800),
                 unselectedIconColor = Color(0xFF999999),

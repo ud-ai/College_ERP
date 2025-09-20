@@ -25,6 +25,8 @@ fun HostelStaffDashboard(
         bottomBar = { 
             HostelBottomNavigation(
                 onNavigateToProfile = onNavigateToProfile,
+                onNavigateToHostel = onNavigateToHostel,
+                onNavigateToRooms = onNavigateToRooms,
                 onSignOut = onSignOut
             ) 
         }
@@ -136,6 +138,8 @@ fun HostelStaffDashboard(
 @Composable
 fun HostelBottomNavigation(
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToHostel: () -> Unit = {},
+    onNavigateToRooms: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
     NavigationBar(
@@ -161,11 +165,11 @@ fun HostelBottomNavigation(
             icon = {
                 Icon(
                     Icons.Default.Build,
-                    contentDescription = "Maintenance"
+                    contentDescription = "Allocation"
                 )
             },
             selected = false,
-            onClick = { },
+            onClick = onNavigateToHostel,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF9C27B0),
                 unselectedIconColor = Color(0xFF999999),
@@ -176,11 +180,11 @@ fun HostelBottomNavigation(
             icon = {
                 Icon(
                     Icons.Default.DateRange,
-                    contentDescription = "Reports"
+                    contentDescription = "Rooms"
                 )
             },
             selected = false,
-            onClick = { },
+            onClick = onNavigateToRooms,
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFF9C27B0),
                 unselectedIconColor = Color(0xFF999999),

@@ -9,6 +9,7 @@ import com.example.collegeerp.data.local.dao.PaymentDao
 import com.example.collegeerp.data.local.dao.QueueDao
 import com.example.collegeerp.data.local.dao.RoomDao
 import com.example.collegeerp.data.local.dao.StudentDao
+import com.example.collegeerp.data.local.dao.UserDao
 import com.example.collegeerp.data.local.entity.ExamRecordEntity
 import com.example.collegeerp.data.local.entity.RoomOccupancyEntity
 import com.example.collegeerp.data.local.entity.WriteQueueEntity
@@ -31,6 +32,7 @@ import com.example.collegeerp.data.local.entity.UserEntity
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun userDao(): UserDao
     abstract fun studentDao(): StudentDao
     abstract fun paymentDao(): PaymentDao
     abstract fun roomDao(): RoomDao

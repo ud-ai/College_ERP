@@ -15,19 +15,24 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExamStaffDashboard(
+fun AdminDashboard(
+    onNavigateToAdmissions: () -> Unit = {},
+    onNavigateToStudents: () -> Unit = {},
+    onNavigateToPayments: () -> Unit = {},
+    onNavigateToHostel: () -> Unit = {},
     onNavigateToExams: () -> Unit = {},
-    onNavigateToMarks: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToNotifications: () -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {},
+    onNavigateToDocuments: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
     Scaffold(
         bottomBar = { 
-            ExamBottomNavigation(
+            AdminBottomNavigation(
                 onNavigateToProfile = onNavigateToProfile,
-                onNavigateToExams = onNavigateToExams,
-                onNavigateToMarks = onNavigateToMarks,
-                onSignOut = onSignOut
+                onNavigateToNotifications = onNavigateToNotifications,
+                onNavigateToDocuments = onNavigateToDocuments
             ) 
         }
     ) { paddingValues ->
@@ -37,56 +42,34 @@ fun ExamStaffDashboard(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF44336))
+                    .background(Color(0xFF673AB7))
                     .padding(16.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
-                    
-                    Text(
-                        text = "Exam Department",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
-                }
+                Text(
+                    text = "Admin Dashboard",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
             
-            // Content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "Examination Management",
+                    text = "System Administration",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF333333),
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
                 
-                // Exam specific cards
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -95,17 +78,17 @@ fun ExamStaffDashboard(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         DepartmentQuickAccessCard(
-                            title = "Exam Records",
-                            icon = Icons.Default.Star,
-                            color = Color(0xFFF44336),
-                            onClick = onNavigateToExams,
+                            title = "Admissions",
+                            icon = Icons.Default.Add,
+                            color = Color(0xFF4CAF50),
+                            onClick = onNavigateToAdmissions,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
-                            title = "Marks Entry",
-                            icon = Icons.Default.Edit,
+                            title = "Students",
+                            icon = Icons.Default.Person,
                             color = Color(0xFF2196F3),
-                            onClick = onNavigateToMarks,
+                            onClick = onNavigateToStudents,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -115,17 +98,37 @@ fun ExamStaffDashboard(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         DepartmentQuickAccessCard(
-                            title = "Result Analysis",
-                            icon = Icons.Default.Info,
-                            color = Color(0xFF4CAF50),
-                            onClick = { },
+                            title = "Payments",
+                            icon = Icons.Default.AccountBox,
+                            color = Color(0xFFFF9800),
+                            onClick = onNavigateToPayments,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
-                            title = "Transcripts",
-                            icon = Icons.Default.List,
-                            color = Color(0xFFFF9800),
-                            onClick = { },
+                            title = "Hostel",
+                            icon = Icons.Default.Home,
+                            color = Color(0xFF9C27B0),
+                            onClick = onNavigateToHostel,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        DepartmentQuickAccessCard(
+                            title = "Exams",
+                            icon = Icons.Default.Star,
+                            color = Color(0xFFF44336),
+                            onClick = onNavigateToExams,
+                            modifier = Modifier.weight(1f)
+                        )
+                        DepartmentQuickAccessCard(
+                            title = "Analytics",
+                            icon = Icons.Default.Info,
+                            color = Color(0xFF607D8B),
+                            onClick = onNavigateToAnalytics,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -136,11 +139,10 @@ fun ExamStaffDashboard(
 }
 
 @Composable
-fun ExamBottomNavigation(
+fun AdminBottomNavigation(
     onNavigateToProfile: () -> Unit = {},
-    onNavigateToExams: () -> Unit = {},
-    onNavigateToMarks: () -> Unit = {},
-    onSignOut: () -> Unit = {}
+    onNavigateToNotifications: () -> Unit = {},
+    onNavigateToDocuments: () -> Unit = {}
 ) {
     NavigationBar(
         containerColor = Color.White,
@@ -156,39 +158,39 @@ fun ExamBottomNavigation(
             selected = true,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFFF44336),
+                selectedIconColor = Color(0xFF673AB7),
                 unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFFF44336).copy(alpha = 0.12f)
+                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
             )
         )
         NavigationBarItem(
             icon = {
                 Icon(
-                    Icons.Default.Star,
-                    contentDescription = "Exams"
+                    Icons.Default.Notifications,
+                    contentDescription = "Notifications"
                 )
             },
             selected = false,
-            onClick = onNavigateToExams,
+            onClick = onNavigateToNotifications,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFFF44336),
+                selectedIconColor = Color(0xFF673AB7),
                 unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFFF44336).copy(alpha = 0.12f)
+                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
             )
         )
         NavigationBarItem(
             icon = {
                 Icon(
-                    Icons.Default.Edit,
-                    contentDescription = "Marks"
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Documents"
                 )
             },
             selected = false,
-            onClick = onNavigateToMarks,
+            onClick = onNavigateToDocuments,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFFF44336),
+                selectedIconColor = Color(0xFF673AB7),
                 unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFFF44336).copy(alpha = 0.12f)
+                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
             )
         )
         NavigationBarItem(
@@ -201,9 +203,9 @@ fun ExamBottomNavigation(
             selected = false,
             onClick = onNavigateToProfile,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFFF44336),
+                selectedIconColor = Color(0xFF673AB7),
                 unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFFF44336).copy(alpha = 0.12f)
+                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
             )
         )
     }
