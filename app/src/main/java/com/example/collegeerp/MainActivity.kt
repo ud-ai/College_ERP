@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.example.collegeerp.ui.theme.CollegeERPTheme
+import com.example.collegeerp.ui.theme.rememberThemeManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,6 +48,13 @@ import com.example.collegeerp.ui.screens.DocumentsScreen
 import com.example.collegeerp.ui.screens.AttendanceScreen
 import com.example.collegeerp.ui.screens.PendingApplicationsScreen
 import com.example.collegeerp.ui.screens.AdmissionReportsScreen
+import com.example.collegeerp.ui.screens.HostelMaintenanceScreen
+import com.example.collegeerp.ui.screens.HostelReportsScreen
+import com.example.collegeerp.ui.screens.PaymentRecordsScreen
+import com.example.collegeerp.ui.screens.FinancialReportsScreen
+import com.example.collegeerp.ui.screens.OutstandingDuesScreen
+import com.example.collegeerp.ui.screens.ResultAnalysisScreen
+import com.example.collegeerp.ui.screens.TranscriptsScreen
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.*
@@ -56,10 +64,12 @@ class MainActivity : ComponentActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
-			var isDarkMode by remember { mutableStateOf(false) }
+			val themeManager = rememberThemeManager()
+			val isDarkMode by themeManager.isDarkMode.collectAsState(initial = false)
+			
 			CollegeERPTheme(darkTheme = isDarkMode) {
 				Surface(color = MaterialTheme.colorScheme.background) {
-					AppNav(isDarkMode = isDarkMode, onThemeToggle = { isDarkMode = it })
+					AppNav(themeManager = themeManager)
 				}
 			}
 		}
@@ -68,10 +78,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppNav(
-    isDarkMode: Boolean = false,
-    onThemeToggle: (Boolean) -> Unit = {},
+    themeManager: com.example.collegeerp.ui.theme.ThemeManager,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val isDarkMode by themeManager.isDarkMode.collectAsState(initial = false)
     val navController = rememberNavController()
     val user by viewModel.currentUser.collectAsState()
 
@@ -79,8 +89,7 @@ fun AppNav(
         composable(Routes.AUTH) {
             AuthScreen(
                 onSignIn = { email, password -> viewModel.signIn(email, password) },
-                isDarkMode = isDarkMode,
-                onThemeToggle = onThemeToggle
+                themeManager = themeManager
             )
             
             // Handle navigation based on user role using LaunchedEffect to avoid navigating during composition
@@ -188,7 +197,11 @@ fun AppNav(
         }
         composable(Routes.PAYMENTS) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("studentId") ?: ""
-            PaymentsScreen(id) { _, _ -> }
+            PaymentsScreen(
+                studentId = id,
+                onRecord = { _, _ -> },
+                onBack = { navController.popBackStack() }
+            )
         }
         composable(Routes.HOSTEL) { 
             HostelScreen(
@@ -212,7 +225,8 @@ fun AppNav(
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
                 onNavigateToAttendance = { navController.navigate(Routes.ATTENDANCE) },
                 onNavigateToMarks = { navController.navigate(Routes.VIEW_EXAM_RECORDS) },
-                onNavigateToFees = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToFees = { navController.navigate("payments/student123") },
+                themeManager = themeManager,
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate(Routes.AUTH) { popUpTo(0) }
@@ -226,6 +240,7 @@ fun AppNav(
                 onNavigateToPendingApplications = { navController.navigate(Routes.PENDING_APPLICATIONS) },
                 onNavigateToReports = { navController.navigate(Routes.ADMISSION_REPORTS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                themeManager = themeManager,
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate(Routes.AUTH) { popUpTo(0) }
@@ -236,7 +251,10 @@ fun AppNav(
             HostelStaffDashboard(
                 onNavigateToHostel = { navController.navigate(Routes.HOSTEL_ALLOCATION) },
                 onNavigateToRooms = { navController.navigate(Routes.HOSTEL_ROOMS) },
+                onNavigateToMaintenance = { navController.navigate(Routes.HOSTEL_MAINTENANCE) },
+                onNavigateToReports = { navController.navigate(Routes.HOSTEL_REPORTS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                themeManager = themeManager,
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate(Routes.AUTH) { popUpTo(0) }
@@ -245,8 +263,12 @@ fun AppNav(
         }
         composable(Routes.ACCOUNTS_DASHBOARD) {
             AccountsStaffDashboard(
-                onNavigateToPayments = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToPayments = { navController.navigate("payments/student123") },
+                onNavigateToPaymentRecords = { navController.navigate(Routes.PAYMENT_RECORDS) },
+                onNavigateToFinancialReports = { navController.navigate(Routes.FINANCIAL_REPORTS) },
+                onNavigateToOutstandingDues = { navController.navigate(Routes.OUTSTANDING_DUES) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                themeManager = themeManager,
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate(Routes.AUTH) { popUpTo(0) }
@@ -257,7 +279,10 @@ fun AppNav(
             ExamStaffDashboard(
                 onNavigateToExams = { navController.navigate(Routes.EXAMS) },
                 onNavigateToMarks = { navController.navigate(Routes.ADD_UPDATE_MARKS) },
+                onNavigateToResultAnalysis = { navController.navigate(Routes.RESULT_ANALYSIS) },
+                onNavigateToTranscripts = { navController.navigate(Routes.TRANSCRIPTS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
+                themeManager = themeManager,
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate(Routes.AUTH) { popUpTo(0) }
@@ -268,13 +293,14 @@ fun AppNav(
             AdminDashboard(
                 onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) },
                 onNavigateToStudents = { navController.navigate(Routes.STUDENT_LIST) },
-                onNavigateToPayments = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToPayments = { navController.navigate("payments/student123") },
                 onNavigateToHostel = { navController.navigate(Routes.HOSTEL_ALLOCATION) },
                 onNavigateToExams = { navController.navigate(Routes.EXAMS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
                 onNavigateToNotifications = { navController.navigate(Routes.NOTIFICATIONS) },
                 onNavigateToAnalytics = { navController.navigate(Routes.ANALYTICS) },
                 onNavigateToDocuments = { navController.navigate(Routes.DOCUMENTS) },
+                themeManager = themeManager,
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate(Routes.AUTH) { popUpTo(0) }
@@ -283,7 +309,7 @@ fun AppNav(
         }
         composable(Routes.DASHBOARD) { 
             DashboardScreen(
-                onNavigateToPayments = { navController.navigate(Routes.PAYMENTS) },
+                onNavigateToPayments = { navController.navigate("payments/student123") },
                 onNavigateToHostel = { navController.navigate(Routes.HOSTEL) },
                 onNavigateToAdmissions = { navController.navigate(Routes.ADMISSIONS) },
                 onNavigateToProfile = { navController.navigate(Routes.PROFILE) },
@@ -354,6 +380,41 @@ fun AppNav(
         }
         composable(Routes.ADMISSION_REPORTS) {
             AdmissionReportsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.HOSTEL_MAINTENANCE) {
+            HostelMaintenanceScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.HOSTEL_REPORTS) {
+            HostelReportsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.PAYMENT_RECORDS) {
+            PaymentRecordsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.FINANCIAL_REPORTS) {
+            FinancialReportsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.OUTSTANDING_DUES) {
+            OutstandingDuesScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.RESULT_ANALYSIS) {
+            ResultAnalysisScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.TRANSCRIPTS) {
+            TranscriptsScreen(
                 onBack = { navController.popBackStack() }
             )
         }

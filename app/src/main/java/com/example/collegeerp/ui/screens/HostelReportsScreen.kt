@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdmissionReportsScreen(
+fun HostelReportsScreen(
     onBack: () -> Unit
 ) {
     Column(
@@ -28,7 +28,7 @@ fun AdmissionReportsScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
-            title = { Text("Admission Reports") },
+            title = { Text("Hostel Reports") },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -41,16 +41,17 @@ fun AdmissionReportsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { AdmissionStatsOverview() }
-            item { MonthlyAdmissionTrends() }
-            item { CourseWiseAdmissions() }
-            item { ReportActions() }
+            item { OccupancyOverview() }
+            item { HostelWiseOccupancy() }
+            item { MaintenanceStats() }
+            item { RevenueReport() }
+            item { ExportOptions() }
         }
     }
 }
 
 @Composable
-fun AdmissionStatsOverview() {
+fun OccupancyOverview() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -59,7 +60,7 @@ fun AdmissionStatsOverview() {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "Admission Statistics",
+                text = "Overall Occupancy",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -69,8 +70,8 @@ fun AdmissionStatsOverview() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                StatCard("Total Applications", "2,847", Color(0xFF2196F3))
-                StatCard("Approved", "1,247", Color(0xFF4CAF50))
+                OccupancyStat("Total Rooms", "450", Color(0xFF2196F3))
+                OccupancyStat("Occupied", "387", Color(0xFF4CAF50))
             }
             
             Spacer(modifier = Modifier.height(12.dp))
@@ -79,15 +80,15 @@ fun AdmissionStatsOverview() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                StatCard("Pending", "234", Color(0xFFFF9800))
-                StatCard("Rejected", "1,366", Color(0xFFFF5722))
+                OccupancyStat("Available", "63", Color(0xFFFF9800))
+                OccupancyStat("Occupancy Rate", "86%", Color(0xFF9C27B0))
             }
         }
     }
 }
 
 @Composable
-fun StatCard(title: String, value: String, color: Color) {
+fun OccupancyStat(title: String, value: String, color: Color) {
     Card(
         modifier = Modifier
             .width(150.dp)
@@ -116,7 +117,7 @@ fun StatCard(title: String, value: String, color: Color) {
 }
 
 @Composable
-fun MonthlyAdmissionTrends() {
+fun HostelWiseOccupancy() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -128,13 +129,13 @@ fun MonthlyAdmissionTrends() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    Icons.Default.Info,
+                    Icons.Default.Home,
                     contentDescription = null,
-                    tint = Color(0xFF4CAF50)
+                    tint = Color(0xFF9C27B0)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Monthly Trends",
+                    text = "Hostel-wise Occupancy",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -142,43 +143,17 @@ fun MonthlyAdmissionTrends() {
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            Text("January: 245 applications (+15% from last year)")
-            Text("February: 312 applications (+22% from last year)")
-            Text("March: 428 applications (+18% from last year)")
-            Text("April: 567 applications (+25% from last year)")
+            HostelOccupancyItem("Hostel A", 120, 108)
+            HostelOccupancyItem("Hostel B", 150, 142)
+            HostelOccupancyItem("Hostel C", 100, 87)
+            HostelOccupancyItem("Hostel D", 80, 50)
         }
     }
 }
 
 @Composable
-fun CourseWiseAdmissions() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Text(
-                text = "Course-wise Admissions",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            CourseAdmissionItem("Computer Science", 456, 89)
-            CourseAdmissionItem("Mathematics", 234, 67)
-            CourseAdmissionItem("Physics", 189, 45)
-            CourseAdmissionItem("Chemistry", 167, 38)
-            CourseAdmissionItem("English", 123, 28)
-        }
-    }
-}
-
-@Composable
-fun CourseAdmissionItem(course: String, applications: Int, admissions: Int) {
-    val percentage = if (applications > 0) (admissions * 100) / applications else 0
+fun HostelOccupancyItem(hostelName: String, totalRooms: Int, occupiedRooms: Int) {
+    val occupancyRate = if (totalRooms > 0) (occupiedRooms * 100) / totalRooms else 0
     
     Row(
         modifier = Modifier
@@ -189,26 +164,98 @@ fun CourseAdmissionItem(course: String, applications: Int, admissions: Int) {
     ) {
         Column {
             Text(
-                text = course,
+                text = hostelName,
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "$admissions/$applications applications",
+                text = "$occupiedRooms/$totalRooms rooms",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
         
         Text(
-            text = "$percentage%",
+            text = "$occupancyRate%",
             fontWeight = FontWeight.Bold,
-            color = if (percentage >= 50) Color(0xFF4CAF50) else Color(0xFFFF9800)
+            color = if (occupancyRate >= 80) Color(0xFF4CAF50) else Color(0xFFFF9800)
         )
     }
 }
 
 @Composable
-fun ReportActions() {
+fun MaintenanceStats() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Text(
+                text = "Maintenance Statistics",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                MaintenanceStat("Pending", "12", Color(0xFFFF9800))
+                MaintenanceStat("In Progress", "8", Color(0xFF2196F3))
+                MaintenanceStat("Completed", "45", Color(0xFF4CAF50))
+            }
+        }
+    }
+}
+
+@Composable
+fun MaintenanceStat(label: String, count: String, color: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = count,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+    }
+}
+
+@Composable
+fun RevenueReport() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Text(
+                text = "Revenue Report",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text("Monthly Revenue: ₹4,87,500")
+            Text("Outstanding Dues: ₹45,200")
+            Text("Collection Rate: 92%")
+        }
+    }
+}
+
+@Composable
+fun ExportOptions() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -232,7 +279,7 @@ fun ReportActions() {
                     onClick = { /* Export PDF */ },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF5722)
+                        containerColor = Color(0xFF9C27B0)
                     )
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))

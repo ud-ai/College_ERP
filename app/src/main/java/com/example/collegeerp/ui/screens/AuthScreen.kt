@@ -29,8 +29,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AuthScreen(
     onSignIn: (String, String) -> Unit,
-    isDarkMode: Boolean = false,
-    onThemeToggle: (Boolean) -> Unit = {},
+    themeManager: com.example.collegeerp.ui.theme.ThemeManager? = null,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     var isLogin by remember { mutableStateOf(true) }
@@ -54,13 +53,21 @@ fun AuthScreen(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // Theme toggle button in top-right corner
-            ThemeToggleButton(
-                isDarkMode = isDarkMode,
-                onToggle = onThemeToggle,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
-            )
+            themeManager?.let {
+                val isDarkMode by it.isDarkMode.collectAsState(initial = false)
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(20.dp)
+                ) {
+                    com.example.collegeerp.ui.components.ThemeToggleButton(
+                        isDarkMode = isDarkMode,
+                        onToggle = { it.toggleTheme() }
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -164,9 +171,10 @@ fun AuthScreen(
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
                     Text(
-                        text = if (isLogin) "Don't have an account? Sign Up" else "Already have an account? Log in",
-                        color = Color(0xFF2196F3),
-                        fontSize = 14.sp
+                        text = if (isLogin) "Don't have an account? Sign Up" else "Already have an account? Sign In",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 }
                 
@@ -192,24 +200,25 @@ fun LoginForm(
     )
     
     Text(
-        text = "Sign in to your account",
+        text = "Sign in to continue",
         fontSize = 16.sp,
-        color = Color(0xFF666666),
-        modifier = Modifier.padding(bottom = 48.dp)
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(bottom = 32.dp)
     )
     
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(32.dp)
+            modifier = Modifier.padding(24.dp)
         ) {
             Text(
-                text = "Email address",
+                text = "Email",
                 fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -217,8 +226,8 @@ fun LoginForm(
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                placeholder = { Text("you@example.com", color = Color(0xFFBBBBBB)) },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                placeholder = { Text("you@example.com", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -226,12 +235,13 @@ fun LoginForm(
                     focusedTextColor = MaterialTheme.colorScheme.onSurface,
                     unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             
             Text(
                 text = "Password",
                 fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -239,7 +249,7 @@ fun LoginForm(
             OutlinedTextField(
                 value = password,
                 onValueChange = onPasswordChange,
-                placeholder = { Text("••••••••", color = Color(0xFFBBBBBB)) },
+                placeholder = { Text("••••••••", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 singleLine = true,
@@ -249,17 +259,18 @@ fun LoginForm(
                     focusedTextColor = MaterialTheme.colorScheme.onSurface,
                     unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             )
             
             TextButton(
                 onClick = onForgotPassword,
-                modifier = Modifier.align(Alignment.End).padding(bottom = 32.dp)
+                modifier = Modifier.align(Alignment.End).padding(bottom = 24.dp)
             ) {
                 Text(
-                    text = "Forgot your password?",
-                    color = Color(0xFF2196F3),
-                    fontSize = 14.sp
+                    text = "Forgot password?",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
             
@@ -274,23 +285,23 @@ fun LoginForm(
             
             Button(
                 onClick = onSignIn,
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                shape = RoundedCornerShape(12.dp),
                 enabled = !isLoading && email.isNotBlank() && password.isNotBlank()
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         strokeWidth = 2.dp
                     )
                 } else {
                     Text(
-                        text = "Sign in",
-                        color = Color.White,
+                        text = "Sign In",
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }
@@ -313,13 +324,23 @@ fun SignUpForm(
     onRoleChange: (String) -> Unit,
     onSignUp: () -> Unit
 ) {
-    Text(
-        text = "Sign Up",
-        fontSize = 36.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color(0xFF2C2C2C),
-        modifier = Modifier.padding(bottom = 48.dp)
-    )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(bottom = 32.dp)
+    ) {
+        Text(
+            text = "Create Account",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = "Join the college community",
+            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+    }
     
     Card(
         modifier = Modifier.fillMaxWidth(),

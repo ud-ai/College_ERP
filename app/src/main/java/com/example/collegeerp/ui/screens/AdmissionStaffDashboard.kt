@@ -24,6 +24,7 @@ fun AdmissionStaffDashboard(
     onNavigateToPendingApplications: () -> Unit = {},
     onNavigateToReports: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    themeManager: com.example.collegeerp.ui.theme.ThemeManager? = null,
     onSignOut: () -> Unit = {}
 ) {
     Scaffold(
@@ -39,14 +40,14 @@ fun AdmissionStaffDashboard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF4CAF50))
+                    .background(MaterialTheme.colorScheme.secondary)
                     .padding(16.dp)
             ) {
                 Row(
@@ -58,22 +59,31 @@ fun AdmissionStaffDashboard(
                         imageVector = Icons.Default.Menu,
                         contentDescription = "Menu",
                         modifier = Modifier.size(24.dp),
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onSecondary
                     )
                     
                     Text(
                         text = "Admissions Department",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onSecondary
                     )
                     
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
+                    Row {
+                        themeManager?.let {
+                            val isDarkMode by it.isDarkMode.collectAsState(initial = false)
+                            com.example.collegeerp.ui.components.ThemeToggleButton(
+                                isDarkMode = isDarkMode,
+                                onToggle = { it.toggleTheme() }
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
                 }
             }
             
@@ -87,7 +97,7 @@ fun AdmissionStaffDashboard(
                     text = "Admission Management",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF333333),
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
                 
@@ -102,14 +112,14 @@ fun AdmissionStaffDashboard(
                         DepartmentQuickAccessCard(
                             title = "New Admissions",
                             icon = Icons.Default.Add,
-                            color = Color(0xFF4CAF50),
+                            color = MaterialTheme.colorScheme.secondary,
                             onClick = onNavigateToAdmissions,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
                             title = "Student Records",
                             icon = Icons.Default.Person,
-                            color = Color(0xFF2196F3),
+                            color = MaterialTheme.colorScheme.primary,
                             onClick = onNavigateToStudents,
                             modifier = Modifier.weight(1f)
                         )
@@ -122,14 +132,14 @@ fun AdmissionStaffDashboard(
                         DepartmentQuickAccessCard(
                             title = "Pending Applications",
                             icon = Icons.Default.Notifications,
-                            color = Color(0xFFFF9800),
+                            color = MaterialTheme.colorScheme.tertiary,
                             onClick = onNavigateToPendingApplications,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
                             title = "Reports",
                             icon = Icons.Default.Info,
-                            color = Color(0xFF9C27B0),
+                            color = MaterialTheme.colorScheme.error,
                             onClick = onNavigateToReports,
                             modifier = Modifier.weight(1f)
                         )
@@ -154,7 +164,7 @@ fun DepartmentQuickAccessCard(
             .height(140.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -187,7 +197,7 @@ fun DepartmentQuickAccessCard(
                 text = title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF333333),
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
         }
@@ -202,7 +212,7 @@ fun StaffBottomNavigation(
     onSignOut: () -> Unit = {}
 ) {
     NavigationBar(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
         NavigationBarItem(
@@ -215,9 +225,9 @@ fun StaffBottomNavigation(
             selected = true,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF4CAF50),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF4CAF50).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.secondaryContainer
             )
         )
         NavigationBarItem(
@@ -230,9 +240,9 @@ fun StaffBottomNavigation(
             selected = false,
             onClick = onNavigateToAdmissions,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF4CAF50),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF4CAF50).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.secondaryContainer
             )
         )
         NavigationBarItem(
@@ -245,9 +255,9 @@ fun StaffBottomNavigation(
             selected = false,
             onClick = onNavigateToStudents,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF4CAF50),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF4CAF50).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.secondaryContainer
             )
         )
         NavigationBarItem(
@@ -260,9 +270,9 @@ fun StaffBottomNavigation(
             selected = false,
             onClick = onNavigateToProfile,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF4CAF50),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF4CAF50).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.secondaryContainer
             )
         )
     }

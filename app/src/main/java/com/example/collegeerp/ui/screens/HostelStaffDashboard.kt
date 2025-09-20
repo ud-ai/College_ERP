@@ -18,7 +18,10 @@ import androidx.compose.ui.unit.sp
 fun HostelStaffDashboard(
     onNavigateToHostel: () -> Unit = {},
     onNavigateToRooms: () -> Unit = {},
+    onNavigateToMaintenance: () -> Unit = {},
+    onNavigateToReports: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    themeManager: com.example.collegeerp.ui.theme.ThemeManager? = null,
     onSignOut: () -> Unit = {}
 ) {
     Scaffold(
@@ -34,14 +37,14 @@ fun HostelStaffDashboard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
             // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF9C27B0))
+                    .background(MaterialTheme.colorScheme.tertiary)
                     .padding(16.dp)
             ) {
                 Row(
@@ -53,22 +56,31 @@ fun HostelStaffDashboard(
                         imageVector = Icons.Default.Menu,
                         contentDescription = "Menu",
                         modifier = Modifier.size(24.dp),
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onTertiary
                     )
                     
                     Text(
                         text = "Hostel Department",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onTertiary
                     )
                     
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        modifier = Modifier.size(24.dp),
-                        tint = Color.White
-                    )
+                    Row {
+                        themeManager?.let {
+                            val isDarkMode by it.isDarkMode.collectAsState(initial = false)
+                            com.example.collegeerp.ui.components.ThemeToggleButton(
+                                isDarkMode = isDarkMode,
+                                onToggle = { it.toggleTheme() }
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile",
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.onTertiary
+                        )
+                    }
                 }
             }
             
@@ -82,7 +94,7 @@ fun HostelStaffDashboard(
                     text = "Hostel Management",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF333333),
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
                 
@@ -118,14 +130,14 @@ fun HostelStaffDashboard(
                             title = "Maintenance",
                             icon = Icons.Default.Build,
                             color = Color(0xFFFF9800),
-                            onClick = { },
+                            onClick = onNavigateToMaintenance,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
                             title = "Reports",
                             icon = Icons.Default.DateRange,
                             color = Color(0xFF4CAF50),
-                            onClick = { },
+                            onClick = onNavigateToReports,
                             modifier = Modifier.weight(1f)
                         )
                     }

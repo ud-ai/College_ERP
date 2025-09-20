@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -126,7 +126,7 @@ fun AttendanceCard(record: AttendanceRecord) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = if (record.status == "Present") Icons.Default.CheckCircle else Icons.Default.Cancel,
+                imageVector = if (record.status == "Present") Icons.Default.CheckCircle else Icons.Default.Close,
                 contentDescription = record.status,
                 tint = if (record.status == "Present") Color(0xFF4CAF50) else Color(0xFFFF5722),
                 modifier = Modifier.size(24.dp)

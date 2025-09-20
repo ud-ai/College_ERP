@@ -12,7 +12,7 @@ android {
 	compileSdk = 34
 
 	defaultConfig {
-		applicationId = "com.example.app"
+		applicationId = "com.example.collegeerp"
 		minSdk = 23
 		targetSdk = 34
 		versionCode = 1
@@ -89,6 +89,9 @@ dependencies {
 
 	implementation(libs.kotlinx.coroutines.core)
 	implementation(libs.kotlinx.coroutines.android)
+
+	// DataStore for theme preferences
+	implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 	testImplementation(libs.junit)
 	testImplementation(libs.mockk)

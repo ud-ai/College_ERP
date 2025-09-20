@@ -17,7 +17,11 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun AccountsStaffDashboard(
     onNavigateToPayments: () -> Unit = {},
+    onNavigateToPaymentRecords: () -> Unit = {},
+    onNavigateToFinancialReports: () -> Unit = {},
+    onNavigateToOutstandingDues: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    themeManager: com.example.collegeerp.ui.theme.ThemeManager? = null,
     onSignOut: () -> Unit = {}
 ) {
     Scaffold(
@@ -103,7 +107,7 @@ fun AccountsStaffDashboard(
                             title = "Payment Records",
                             icon = Icons.Default.List,
                             color = Color(0xFF2196F3),
-                            onClick = { },
+                            onClick = onNavigateToPaymentRecords,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -116,14 +120,14 @@ fun AccountsStaffDashboard(
                             title = "Financial Reports",
                             icon = Icons.Default.Info,
                             color = Color(0xFF4CAF50),
-                            onClick = { },
+                            onClick = onNavigateToFinancialReports,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
                             title = "Outstanding Dues",
                             icon = Icons.Default.Warning,
                             color = Color(0xFFF44336),
-                            onClick = { },
+                            onClick = onNavigateToOutstandingDues,
                             modifier = Modifier.weight(1f)
                         )
                     }

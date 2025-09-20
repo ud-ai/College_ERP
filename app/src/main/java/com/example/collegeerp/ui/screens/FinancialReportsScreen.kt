@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdmissionReportsScreen(
+fun FinancialReportsScreen(
     onBack: () -> Unit
 ) {
     Column(
@@ -28,7 +28,7 @@ fun AdmissionReportsScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
-            title = { Text("Admission Reports") },
+            title = { Text("Financial Reports") },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -41,16 +41,17 @@ fun AdmissionReportsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { AdmissionStatsOverview() }
-            item { MonthlyAdmissionTrends() }
-            item { CourseWiseAdmissions() }
-            item { ReportActions() }
+            item { RevenueOverview() }
+            item { MonthlyCollection() }
+            item { FeeTypeBreakdown() }
+            item { PaymentMethodStats() }
+            item { ExportFinancialReports() }
         }
     }
 }
 
 @Composable
-fun AdmissionStatsOverview() {
+fun RevenueOverview() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -59,7 +60,7 @@ fun AdmissionStatsOverview() {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "Admission Statistics",
+                text = "Revenue Overview",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -69,8 +70,8 @@ fun AdmissionStatsOverview() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                StatCard("Total Applications", "2,847", Color(0xFF2196F3))
-                StatCard("Approved", "1,247", Color(0xFF4CAF50))
+                RevenueStat("Total Revenue", "₹45,67,890", Color(0xFF4CAF50))
+                RevenueStat("This Month", "₹8,45,200", Color(0xFF2196F3))
             }
             
             Spacer(modifier = Modifier.height(12.dp))
@@ -79,15 +80,15 @@ fun AdmissionStatsOverview() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                StatCard("Pending", "234", Color(0xFFFF9800))
-                StatCard("Rejected", "1,366", Color(0xFFFF5722))
+                RevenueStat("Outstanding", "₹2,34,500", Color(0xFFFF9800))
+                RevenueStat("Collection Rate", "95%", Color(0xFF9C27B0))
             }
         }
     }
 }
 
 @Composable
-fun StatCard(title: String, value: String, color: Color) {
+fun RevenueStat(title: String, value: String, color: Color) {
     Card(
         modifier = Modifier
             .width(150.dp)
@@ -102,7 +103,7 @@ fun StatCard(title: String, value: String, color: Color) {
         ) {
             Text(
                 text = value,
-                fontSize = 24.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = color
             )
@@ -116,7 +117,7 @@ fun StatCard(title: String, value: String, color: Color) {
 }
 
 @Composable
-fun MonthlyAdmissionTrends() {
+fun MonthlyCollection() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -134,7 +135,7 @@ fun MonthlyAdmissionTrends() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Monthly Trends",
+                    text = "Monthly Collection Trends",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -142,16 +143,16 @@ fun MonthlyAdmissionTrends() {
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            Text("January: 245 applications (+15% from last year)")
-            Text("February: 312 applications (+22% from last year)")
-            Text("March: 428 applications (+18% from last year)")
-            Text("April: 567 applications (+25% from last year)")
+            Text("January: ₹8,45,200 (+12% from last year)")
+            Text("February: ₹9,23,400 (+18% from last year)")
+            Text("March: ₹7,89,600 (+8% from last year)")
+            Text("April: ₹8,67,300 (+15% from last year)")
         }
     }
 }
 
 @Composable
-fun CourseWiseAdmissions() {
+fun FeeTypeBreakdown() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -160,26 +161,23 @@ fun CourseWiseAdmissions() {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "Course-wise Admissions",
+                text = "Fee Type Breakdown",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            CourseAdmissionItem("Computer Science", 456, 89)
-            CourseAdmissionItem("Mathematics", 234, 67)
-            CourseAdmissionItem("Physics", 189, 45)
-            CourseAdmissionItem("Chemistry", 167, 38)
-            CourseAdmissionItem("English", 123, 28)
+            FeeTypeItem("Tuition Fee", "₹28,45,600", 62)
+            FeeTypeItem("Hostel Fee", "₹12,34,200", 27)
+            FeeTypeItem("Lab Fee", "₹3,45,800", 8)
+            FeeTypeItem("Library Fee", "₹1,42,290", 3)
         }
     }
 }
 
 @Composable
-fun CourseAdmissionItem(course: String, applications: Int, admissions: Int) {
-    val percentage = if (applications > 0) (admissions * 100) / applications else 0
-    
+fun FeeTypeItem(feeType: String, amount: String, percentage: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -189,11 +187,11 @@ fun CourseAdmissionItem(course: String, applications: Int, admissions: Int) {
     ) {
         Column {
             Text(
-                text = course,
+                text = feeType,
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "$admissions/$applications applications",
+                text = amount,
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
@@ -202,13 +200,13 @@ fun CourseAdmissionItem(course: String, applications: Int, admissions: Int) {
         Text(
             text = "$percentage%",
             fontWeight = FontWeight.Bold,
-            color = if (percentage >= 50) Color(0xFF4CAF50) else Color(0xFFFF9800)
+            color = Color(0xFF4CAF50)
         )
     }
 }
 
 @Composable
-fun ReportActions() {
+fun PaymentMethodStats() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp)
@@ -217,7 +215,55 @@ fun ReportActions() {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "Export Reports",
+                text = "Payment Method Statistics",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                PaymentMethodStat("Online", "68%", Color(0xFF2196F3))
+                PaymentMethodStat("Cash", "22%", Color(0xFF4CAF50))
+                PaymentMethodStat("Cheque", "10%", Color(0xFFFF9800))
+            }
+        }
+    }
+}
+
+@Composable
+fun PaymentMethodStat(method: String, percentage: String, color: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = percentage,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
+        Text(
+            text = method,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+    }
+}
+
+@Composable
+fun ExportFinancialReports() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Text(
+                text = "Export Financial Reports",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -232,7 +278,7 @@ fun ReportActions() {
                     onClick = { /* Export PDF */ },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF5722)
+                        containerColor = Color(0xFFFF9800)
                     )
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))

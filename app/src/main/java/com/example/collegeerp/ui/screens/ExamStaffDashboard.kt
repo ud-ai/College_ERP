@@ -18,7 +18,10 @@ import androidx.compose.ui.unit.sp
 fun ExamStaffDashboard(
     onNavigateToExams: () -> Unit = {},
     onNavigateToMarks: () -> Unit = {},
+    onNavigateToResultAnalysis: () -> Unit = {},
+    onNavigateToTranscripts: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    themeManager: com.example.collegeerp.ui.theme.ThemeManager? = null,
     onSignOut: () -> Unit = {}
 ) {
     Scaffold(
@@ -118,14 +121,14 @@ fun ExamStaffDashboard(
                             title = "Result Analysis",
                             icon = Icons.Default.Info,
                             color = Color(0xFF4CAF50),
-                            onClick = { },
+                            onClick = onNavigateToResultAnalysis,
                             modifier = Modifier.weight(1f)
                         )
                         DepartmentQuickAccessCard(
                             title = "Transcripts",
                             icon = Icons.Default.List,
                             color = Color(0xFFFF9800),
-                            onClick = { },
+                            onClick = onNavigateToTranscripts,
                             modifier = Modifier.weight(1f)
                         )
                     }

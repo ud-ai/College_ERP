@@ -12,6 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,6 +28,7 @@ fun AdminDashboard(
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {},
     onNavigateToDocuments: () -> Unit = {},
+    themeManager: com.example.collegeerp.ui.theme.ThemeManager? = null,
     onSignOut: () -> Unit = {}
 ) {
     Scaffold(
@@ -39,22 +43,62 @@ fun AdminDashboard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF673AB7))
-                    .padding(16.dp)
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = 1.dp
             ) {
-                Text(
-                    text = "Admin Dashboard",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "System Control",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Admin Dashboard",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        themeManager?.let {
+                            val isDarkMode by it.isDarkMode.collectAsState(initial = false)
+                            com.example.collegeerp.ui.components.ThemeToggleButton(
+                                isDarkMode = isDarkMode,
+                                onToggle = { it.toggleTheme() }
+                            )
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
             }
             
             Column(
@@ -63,11 +107,11 @@ fun AdminDashboard(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = "System Administration",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF333333),
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    text = "Management Tools",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
                 
                 Column(
@@ -77,17 +121,19 @@ fun AdminDashboard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        DepartmentQuickAccessCard(
+                        ModernDepartmentCard(
                             title = "Admissions",
+                            subtitle = "Manage applications",
                             icon = Icons.Default.Add,
-                            color = Color(0xFF4CAF50),
+                            color = MaterialTheme.colorScheme.secondary,
                             onClick = onNavigateToAdmissions,
                             modifier = Modifier.weight(1f)
                         )
-                        DepartmentQuickAccessCard(
+                        ModernDepartmentCard(
                             title = "Students",
+                            subtitle = "Student records",
                             icon = Icons.Default.Person,
-                            color = Color(0xFF2196F3),
+                            color = MaterialTheme.colorScheme.primary,
                             onClick = onNavigateToStudents,
                             modifier = Modifier.weight(1f)
                         )
@@ -97,17 +143,19 @@ fun AdminDashboard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        DepartmentQuickAccessCard(
+                        ModernDepartmentCard(
                             title = "Payments",
+                            subtitle = "Financial records",
                             icon = Icons.Default.AccountBox,
-                            color = Color(0xFFFF9800),
+                            color = MaterialTheme.colorScheme.tertiary,
                             onClick = onNavigateToPayments,
                             modifier = Modifier.weight(1f)
                         )
-                        DepartmentQuickAccessCard(
+                        ModernDepartmentCard(
                             title = "Hostel",
+                            subtitle = "Room management",
                             icon = Icons.Default.Home,
-                            color = Color(0xFF9C27B0),
+                            color = MaterialTheme.colorScheme.error,
                             onClick = onNavigateToHostel,
                             modifier = Modifier.weight(1f)
                         )
@@ -117,17 +165,19 @@ fun AdminDashboard(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        DepartmentQuickAccessCard(
+                        ModernDepartmentCard(
                             title = "Exams",
+                            subtitle = "Test management",
                             icon = Icons.Default.Star,
-                            color = Color(0xFFF44336),
+                            color = MaterialTheme.colorScheme.primary,
                             onClick = onNavigateToExams,
                             modifier = Modifier.weight(1f)
                         )
-                        DepartmentQuickAccessCard(
+                        ModernDepartmentCard(
                             title = "Analytics",
+                            subtitle = "System insights",
                             icon = Icons.Default.Info,
-                            color = Color(0xFF607D8B),
+                            color = MaterialTheme.colorScheme.secondary,
                             onClick = onNavigateToAnalytics,
                             modifier = Modifier.weight(1f)
                         )
@@ -145,8 +195,9 @@ fun AdminBottomNavigation(
     onNavigateToDocuments: () -> Unit = {}
 ) {
     NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 8.dp
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         NavigationBarItem(
             icon = {
@@ -158,9 +209,9 @@ fun AdminBottomNavigation(
             selected = true,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF673AB7),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.primaryContainer
             )
         )
         NavigationBarItem(
@@ -173,9 +224,9 @@ fun AdminBottomNavigation(
             selected = false,
             onClick = onNavigateToNotifications,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF673AB7),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.primaryContainer
             )
         )
         NavigationBarItem(
@@ -188,9 +239,9 @@ fun AdminBottomNavigation(
             selected = false,
             onClick = onNavigateToDocuments,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF673AB7),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.primaryContainer
             )
         )
         NavigationBarItem(
@@ -203,10 +254,69 @@ fun AdminBottomNavigation(
             selected = false,
             onClick = onNavigateToProfile,
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF673AB7),
-                unselectedIconColor = Color(0xFF999999),
-                indicatorColor = Color(0xFF673AB7).copy(alpha = 0.12f)
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                indicatorColor = MaterialTheme.colorScheme.primaryContainer
             )
         )
     }
 }
+
+@Composable
+fun ModernDepartmentCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    color: Color,
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier
+            .height(120.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = color.copy(alpha = 0.1f),
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                )
+            }
+            
+            Column {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = subtitle,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
