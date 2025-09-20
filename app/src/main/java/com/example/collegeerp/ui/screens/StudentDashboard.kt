@@ -100,14 +100,59 @@ fun StudentDashboard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp)
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+                // Live Stats Section
+                Text(
+                    text = "Your Progress",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    com.example.collegeerp.ui.components.InteractiveStatsCard(
+                        title = "Attendance",
+                        value = "87%",
+                        change = "+3%",
+                        isPositive = true,
+                        icon = Icons.Default.DateRange,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    com.example.collegeerp.ui.components.InteractiveStatsCard(
+                        title = "CGPA",
+                        value = "8.4",
+                        change = "+0.2",
+                        isPositive = true,
+                        icon = Icons.Default.Star,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                com.example.collegeerp.ui.components.LiveMetricsCard(
+                    title = "Subject Performance",
+                    metrics = listOf(
+                        "Math" to 85f,
+                        "Physics" to 92f,
+                        "Chemistry" to 78f
+                    )
+                )
+                
+                com.example.collegeerp.ui.components.AttendanceChart()
+                com.example.collegeerp.ui.components.MarksProgressChart()
+                com.example.collegeerp.ui.components.FeesStatusChart()
+                
                 Text(
                     text = "Quick Actions",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 // Student specific cards - 2x2 grid

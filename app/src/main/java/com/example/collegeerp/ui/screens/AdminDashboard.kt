@@ -2,6 +2,8 @@ package com.example.collegeerp.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -104,14 +106,58 @@ fun AdminDashboard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp)
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+                // Live Metrics Section
+                Text(
+                    text = "Live System Metrics",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    com.example.collegeerp.ui.components.InteractiveStatsCard(
+                        title = "Total Students",
+                        value = "1,247",
+                        change = "+12%",
+                        isPositive = true,
+                        icon = Icons.Default.Person,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    com.example.collegeerp.ui.components.InteractiveStatsCard(
+                        title = "Revenue",
+                        value = "₹8.5L",
+                        change = "+8%",
+                        isPositive = true,
+                        icon = Icons.Default.AccountBox,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                com.example.collegeerp.ui.components.LiveMetricsCard(
+                    title = "Department Performance",
+                    metrics = listOf(
+                        "Academic" to 92f,
+                        "Finance" to 85f,
+                        "Hostel" to 78f
+                    )
+                )
+                
+                com.example.collegeerp.ui.components.DepartmentStatsChart()
+                com.example.collegeerp.ui.components.HostelOccupancyChart()
+                
                 Text(
                     text = "Management Tools",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 Column(
